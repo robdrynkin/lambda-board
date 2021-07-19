@@ -27,6 +27,21 @@ instance Frontend FrontendMock where
     threadPage _ thread comments = intercalate "\n" (map text comments)
 
 
+b  = Thread "/b"
+bb = Thread "/bb"
+
+db :: DBMock 
+db = DBMock
+    [b, bb]
+    [
+        Comment {threadName = name b, text = "Some b text 1"},
+        Comment {threadName = name b, text = "Some b text 2"},
+        Comment {threadName = name bb, text = "Some bb text 1"},
+        Comment {threadName = name bb, text = "Some bb text 2"},
+        Comment {threadName = name bb, text = "Some bb text 3"}
+    ]
+
+
 main = defaultMain tests
 
 

@@ -13,10 +13,10 @@ data Thread = Thread {
 
 data Comment = Comment {
     id_ :: Int,
-    thread :: Thread,
+    threadName :: String,
     text :: String,
     date :: String,
-    replyToId :: Int
+    replyToId :: Maybe Int
 } deriving (Eq, Show, Generic)
 
 

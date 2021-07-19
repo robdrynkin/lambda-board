@@ -31,6 +31,8 @@ dependencies:
 - wai
 - warp
 - bytestring
+# - postgresql-simple
+- sqlite-simple
 
 library:
   source-dirs: src

@@ -31,6 +31,7 @@ library
       FrontendBase
       Lib
       PostgresDb
+      SqliteDb
   other-modules:
       Paths_lambda_board
   hs-source-dirs:
@@ -41,6 +42,7 @@ library
     , bytestring
     , servant
     , servant-server
+    , sqlite-simple
     , tasty >=0.7
     , tasty-hunit
     , tasty-quickcheck
@@ -63,6 +65,7 @@ executable lambda-board-exe
     , lambda-board
     , servant
     , servant-server
+    , sqlite-simple
     , tasty >=0.7
     , tasty-hunit
     , tasty-quickcheck
@@ -86,6 +89,7 @@ test-suite lambda-board-test
     , lambda-board
     , servant
     , servant-server
+    , sqlite-simple
     , tasty >=0.7
     , tasty-hunit
     , tasty-quickcheck

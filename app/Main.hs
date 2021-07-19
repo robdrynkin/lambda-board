@@ -3,24 +3,19 @@ module Main where
 import App
 
 import Lib
-import PostgresDb
+import SqliteDb
+import Database.SQLite.Simple
 import BootstrapFrontend
 
-b  = Thread "/b"
-bb = Thread "/bb"
-db :: PgDb 
-db = PgDb
-    [b, bb]
-    [
-        Comment {thread = b, text = "Some b text 1"},
-        Comment {thread = b, text = "Some b text 2"},
-        Comment {thread = bb, text = "Some bb text 1"},
-        Comment {thread = bb, text = "Some bb text 2"},
-        Comment {thread = bb, text = "Some bb text 3"}
-    ]
+db :: LiteDb
+db = LiteDb $ open "test.db"
 
 frontend :: BootstrapFrontend
 frontend = BootstrapFrontend 
 
+loadApp :: IO()
+loadApp = do
+    putStrLn "Starting..."
+
 main :: IO ()
-main = run db frontend
+main = loadApp >> run db frontend
