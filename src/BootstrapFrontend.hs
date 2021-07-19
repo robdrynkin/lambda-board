@@ -1,9 +1,9 @@
 module BootstrapFrontend where
 
-import Lib
-import FrontendBase
+import           FrontendBase
+import           Lib
 
-import Data.List
+import           Data.List
 
 
 data BootstrapFrontend = BootstrapFrontend
