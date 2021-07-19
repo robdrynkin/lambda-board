@@ -1,6 +1,6 @@
 module DbBase where
 
-import Lib
+import           Lib
 
 class DB a where
     getThreads        :: a -> IO [Thread]

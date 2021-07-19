@@ -1,7 +1,7 @@
 module PostgresDb where
 
-import DbBase
-import Lib
+import           DbBase
+import           Lib
 
 -- import Database.PostgreSQL.Simple
 

@@ -1,17 +1,17 @@
 module Main where
 
-import App
+import           App
 
-import Lib
-import SqliteDb
-import Database.SQLite.Simple
-import BootstrapFrontend
+import           BootstrapFrontend
+import           Database.SQLite.Simple
+import           Lib
+import           SqliteDb
 
 db :: LiteDb
 db = LiteDb $ open "test.db"
 
 frontend :: BootstrapFrontend
-frontend = BootstrapFrontend 
+frontend = BootstrapFrontend
 
 loadApp :: IO()
 loadApp = do

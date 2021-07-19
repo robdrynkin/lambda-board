@@ -2,8 +2,8 @@
 
 module SqliteDb where
 
-import DbBase
-import Lib
+import           DbBase
+import           Lib
 
 import           Database.SQLite.Simple
 import           Database.SQLite.Simple.FromRow
@@ -25,7 +25,7 @@ instance ToRow Comment where
 instance DB LiteDb where
     getThreads (LiteDb conn) = conn >>= flip query_ "select * from threads"
 
-    getThreadComments (LiteDb conn) curThread = conn >>= \c -> 
+    getThreadComments (LiteDb conn) curThread = conn >>= \c ->
         query c "select * from comments where threadName == (?)" (Only (name curThread))
 
     addComment (LiteDb conn) comment = conn >>= \c ->
