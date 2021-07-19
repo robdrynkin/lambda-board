@@ -25,6 +25,12 @@ dependencies:
 - tasty-quickcheck
 - tasty-hunit
 - tasty-smallcheck
+- aeson
+- servant
+- servant-server
+- wai
+- warp
+- bytestring
 
 library:
   source-dirs: src

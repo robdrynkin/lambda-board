@@ -1,9 +1,14 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Lib where
+
+import           GHC.Generics
+import           Data.Aeson
 
 
 data Thread = Thread {
     name :: String
-} deriving (Eq, Show)
+} deriving (Eq, Show, Generic)
 
 
 data Comment = Comment {
@@ -12,4 +17,11 @@ data Comment = Comment {
     text :: String,
     date :: String,
     replyToId :: Int
-} deriving (Eq, Show)
+} deriving (Eq, Show, Generic)
+
+
+instance ToJSON Thread
+instance FromJSON Thread
+
+instance ToJSON Comment
+instance FromJSON Comment
