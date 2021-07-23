@@ -25,11 +25,11 @@
 
                     <p class="mb-1"> {{ comment.text }} </p>
 
-                    <button type="button" onclick="set_reply_id();" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal">Reply</button>
+                    <button type="button" onclick="set_reply_id('{{ comment.id }}');" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal">Reply</button>
                 {% endfor %}
             </div>
             
-            <button style="width: 100%; margin-top: 40px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal"> New comment </button>
+            <button style="width: 100%; margin-top: 40px;" type="button" onclick="set_reply_id(null)"; class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal"> New comment </button>
             
             </menu>
         </div>
@@ -58,11 +58,9 @@
         </div>
 
         <script>
-            $('#myButton').on('click', function(event) {
-                // event.preventDefault(); // To prevent following the link (optional)
-                alert("asdf");
-            });
-
+            function set_reply_id(replyId) {
+                document.getElementById("replyToId").value = replyId;
+            }
         </script>
 
 
