@@ -11,6 +11,14 @@
     </head>
     <body>
 
+        <nav class="navbar navbar-light bg-light">
+            <div class="container">
+              <a class="navbar-brand" href="/threads">
+                <img src="https://raw.githubusercontent.com/robdrynkin/lambda-board/develop/src/bootstrap_static/imgs/logo.jpeg" alt="" width="30" height="24">
+              </a>
+            </div>
+        </nav>
+
         <div class="container">
             <menu id="nav-main">
             <div class="list-group">
@@ -28,9 +36,9 @@
                     <button type="button" onclick="set_reply_id('{{ comment.id }}');" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal">Reply</button>
                 {% endfor %}
             </div>
-            
+
             <button style="width: 100%; margin-top: 40px;" type="button" onclick="set_reply_id(null)"; class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal"> New comment </button>
-            
+
             </menu>
         </div>
 
@@ -62,7 +70,6 @@
                 document.getElementById("replyToId").value = replyId;
             }
         </script>
-
 
     </body>
 </html>
