@@ -41,6 +41,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , karver
+    , optparse-applicative
     , servant
     , servant-server
     , sqlite-simple
@@ -68,6 +69,7 @@ executable lambda-board-exe
     , bytestring
     , karver
     , lambda-board
+    , optparse-applicative
     , servant
     , servant-server
     , sqlite-simple
@@ -96,6 +98,7 @@ test-suite lambda-board-test
     , bytestring
     , karver
     , lambda-board
+    , optparse-applicative
     , servant
     , servant-server
     , sqlite-simple

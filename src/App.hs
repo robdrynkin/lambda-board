@@ -45,10 +45,9 @@ boardApi :: Proxy BoardApi
 boardApi = Proxy
 
 
-run :: DB d => Frontend f => d -> f -> IO ()
-run db frontend = do
-  let port = 3000
-      settings =
+run :: DB d => Frontend f => Int -> d -> f -> IO ()
+run port db frontend = do
+  let settings =
         setPort port $
         setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port)) $
         defaultSettings
