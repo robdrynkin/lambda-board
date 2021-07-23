@@ -2,8 +2,8 @@
 
 module BootstrapFrontend where
 
-import Lib
-import FrontendBase
+import           FrontendBase
+import           Lib
 
 import Data.List
 import Data.Text (pack, concat)
@@ -13,6 +13,7 @@ import Text.Karver
 import qualified Data.HashMap.Strict as H
 import Data.Text (Text)
 import qualified Data.Vector as V
+import           Data.List
 
 
 data BootstrapFrontend = BootstrapFrontend { threadsTemplate :: Text, commentsTemplate :: Text }

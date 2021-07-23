@@ -2,9 +2,9 @@
 
 module Lib where
 
-import           GHC.Generics
 import           Data.Aeson
 import Data.Text
+import           GHC.Generics
 
 
 data Thread = Thread {
