@@ -8,8 +8,12 @@ import           GHC.Generics
 
 
 data Thread = Thread {
-    name :: Text
+    name      :: Text,
+    ncomments :: Int
 } deriving (Eq, Show, Generic)
+
+instance Ord Thread where
+    (<=) a b = (ncomments a) <= (ncomments b)
 
 
 data Comment = Comment {

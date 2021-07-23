@@ -31,13 +31,13 @@ dependencies:
 - wai
 - warp
 - bytestring
+- optparse-applicative
 # - postgresql-simple
 - sqlite-simple
 - karver
 - unordered-containers
 - text
 - vector
-- pandoc
 
 library:
   source-dirs: src

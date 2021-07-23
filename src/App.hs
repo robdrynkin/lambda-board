@@ -45,10 +45,9 @@ boardApi :: Proxy BoardApi
 boardApi = Proxy
 
 
-run :: DB d => Frontend f => d -> f -> IO ()
-run db frontend = do
-  let port = 3000
-      settings =
+run :: DB d => Frontend f => Int -> d -> f -> IO ()
+run port db frontend = do
+  let settings =
         setPort port $
         setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port)) $
         defaultSettings
@@ -74,9 +73,10 @@ getThreads db frontend = liftIO $ do
 
 getComments :: DB d => Frontend f => d -> f -> Text -> Handler Text
 getComments db frontend threadName = liftIO $ do
-    comments <- DbBase.getThreadComments db (Thread threadName)
-    return $ threadPage frontend (Thread threadName) comments
+    let thread = (Thread threadName 0)
+    comments <- DbBase.getThreadComments db thread
+    return $ threadPage frontend thread comments
 
 
 createThread :: DB d => Frontend f => d -> f -> Handler Text
-createThread db frontend = liftIO (DbBase.addThread db (Thread "asdf")) >> return ""
+createThread db frontend = liftIO (DbBase.addThread db (Thread "asdf" 0)) >> return ""
