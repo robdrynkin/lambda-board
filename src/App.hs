@@ -6,6 +6,7 @@ import           DbBase
 import           FrontendBase
 
 import           Control.Monad.IO.Class
+import           Control.Monad.Reader
 import           Data.Aeson
 import           Data.ByteString.Lazy.Char8 as C (fromStrict, pack)
 import           Data.Text
@@ -14,9 +15,10 @@ import           GHC.Generics
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Servant
-import           System.IO
-import           Control.Monad.Reader
+import           Servant.API                (StdMethod (POST))
 import           SqliteDb
+import           System.IO
+import           Web.FormUrlEncoded         (FromForm)
 
 type AppM = ReaderT LiteDb Handler
 
@@ -30,11 +32,17 @@ instance Accept HTML where
 instance MimeRender HTML Text where
    mimeRender _ val = fromStrict $ encodeUtf8 val
 
+type Redirect = (Headers '[Header "Location" Text] NoContent)
 
-type BoardApi
-  =    "threads" :> Get '[HTML] Text
-  :<|> "thread" :> Capture "name" Text :> Get '[HTML] Text
-  :<|> "createThread" :> Post '[HTML] Text
+data CreateThreadForm = CreateThreadForm { threadName :: Text } deriving (Eq, Show, Generic)
+
+instance FromForm CreateThreadForm
+
+type BoardApi =
+  Get '[HTML] Text :<|>
+  "thread" :> Capture "name" Text :> Get '[HTML] Text :<|>
+  "create_thread" :> ReqBody '[FormUrlEncoded] CreateThreadForm :>
+      Verb 'POST 301 '[HTML] Redirect
 
 boardApi :: Proxy BoardApi
 boardApi = Proxy
@@ -65,15 +73,18 @@ server frontend =
 getThreads :: Frontend f => f -> AppM Text
 getThreads frontend = do
     threads <- DbBase.getThreads
-    pure $ allThreadsPage frontend threads
+    pure  $ allThreadsPage frontend threads
 
 
 getComments :: Frontend f => f -> Text -> AppM Text
 getComments frontend threadName = do
-    let thread = Thread threadName 0
-    comments <- DbBase.getThreadComments thread
-    pure $ threadPage frontend thread comments
+    comments <- DbBase.getThreadComments threadName
+    pure $ threadPage frontend threadName comments
 
+redirect :: Text -> Redirect
+redirect a = addHeader a NoContent
 
-createThread :: (Frontend f) => f -> AppM Text
-createThread frontend = DbBase.addThread (Thread "asdf" 0) >> pure ""
+createThread :: (Frontend f) => f -> CreateThreadForm -> AppM Redirect
+createThread frontend (CreateThreadForm threadName) = do
+    DbBase.addThread threadName
+    pure $ redirect ("thread/" <> threadName)

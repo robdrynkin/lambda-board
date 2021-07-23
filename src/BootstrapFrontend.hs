@@ -27,7 +27,7 @@ instance Frontend BootstrapFrontend where
         renderTemplate content temp
 
     -- threadPage _ thread comments = Data.Text.concat (map text comments)
-    threadPage (BootstrapFrontend _ temp) thread comments = let {
+    threadPage (BootstrapFrontend _ temp) threadName comments = let {
             parseComment comment = Object $ H.fromList [
                 ("id", (pack . show . id_) comment),
                 ("text", text comment),
@@ -35,7 +35,7 @@ instance Frontend BootstrapFrontend where
                 ("date", date comment)
             ];
             content = H.fromList [
-                ("title", Literal (name thread)),
+                ("title", Literal threadName),
                 ("comments", List $ V.fromList $ map parseComment comments)
             ]}
             in

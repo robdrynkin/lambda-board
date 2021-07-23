@@ -28,10 +28,10 @@
                 </a>
             {% endfor %}
 
-            <form method="post" action="/createThread">
+            <form method="post" action="/create_thread">
                 <div class="mb-3">
                   <label for="threadName" class="form-label">Thread name</label>
-                  <input type="text" class="form-control" id="threadName" aria-describedby="threadNameHelp">
+                  <input type="text" class="form-control" name="threadName" aria-describedby="threadNameHelp">
                   <div id="emailHelp" class="form-text">Thread name should be unique</div>
                 </div>
                 <button type="submit" class="btn btn-primary">Create</button>

@@ -27,6 +27,7 @@ dependencies:
   - mtl
   - optparse-applicative
   - servant
+  - http-api-data
   - servant-server
   - sqlite-simple
   - tasty >= 0.7

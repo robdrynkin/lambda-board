@@ -53,6 +53,7 @@ library
       aeson
     , base >=4.7 && <5
     , bytestring
+    , http-api-data
     , karver
     , mtl
     , optparse-applicative
@@ -81,6 +82,7 @@ executable lambda-board-exe
       aeson
     , base >=4.7 && <5
     , bytestring
+    , http-api-data
     , karver
     , lambda-board
     , mtl
@@ -111,6 +113,7 @@ test-suite lambda-board-test
       aeson
     , base >=4.7 && <5
     , bytestring
+    , http-api-data
     , karver
     , lambda-board
     , mtl
