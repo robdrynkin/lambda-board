@@ -24,6 +24,7 @@ dependencies:
   - base >= 4.7 && < 5
   - bytestring
   - karver
+  - mtl
   - optparse-applicative
   - servant
   - servant-server
@@ -44,12 +45,15 @@ library:
     - BlockArguments
     - DataKinds
     - DeriveGeneric
+    - FlexibleContexts
     - FlexibleInstances
     - LambdaCase
     - MultiParamTypeClasses
     - OverloadedStrings
     - ScopedTypeVariables
+    - TypeApplications
     - TypeOperators
+    - UndecidableInstances
 
 executables:
   lambda-board-exe:
