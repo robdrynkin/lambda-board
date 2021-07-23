@@ -2,11 +2,11 @@ module Main where
 
 import           App
 
-import Lib
-import SqliteDb
-import Database.SQLite.Simple
-import BootstrapFrontend
-import qualified Data.Text.IO as T
+import           BootstrapFrontend
+import qualified Data.Text.IO           as T
+import           Database.SQLite.Simple
+import           Lib
+import           SqliteDb
 
 
 db :: LiteDb
@@ -25,7 +25,7 @@ loadApp = do
 
 main :: IO ()
 -- main = loadApp >> run db frontend
-main = do 
+main = do
     loadApp
     f <- frontend
     run db f

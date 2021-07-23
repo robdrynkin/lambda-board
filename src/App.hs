@@ -16,14 +16,14 @@ import           FrontendBase
 
 import           Control.Monad.IO.Class
 import           Data.Aeson
+import           Data.ByteString.Lazy.Char8 as C (fromStrict, pack)
+import           Data.Text
+import           Data.Text.Encoding         (encodeUtf8)
 import           GHC.Generics
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Servant
 import           System.IO
-import Data.Text
-import Data.Text.Encoding ( encodeUtf8 )
-import Data.ByteString.Lazy.Char8 as C (pack, fromStrict)
 
 -- * api
 

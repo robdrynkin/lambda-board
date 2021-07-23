@@ -1,8 +1,8 @@
 module FrontendBase where
 
-import Data.Text (Text)
+import           Data.Text (Text)
 
-import Lib
+import           Lib
 
 class Frontend a where
     allThreadsPage :: a -> [Thread] -> Text

@@ -3,7 +3,7 @@
 module Lib where
 
 import           Data.Aeson
-import Data.Text
+import           Data.Text
 import           GHC.Generics
 
 
@@ -13,11 +13,11 @@ data Thread = Thread {
 
 
 data Comment = Comment {
-    id_ :: Int,
+    id_        :: Int,
     threadName :: Text,
-    text :: Text,
-    date :: String,
-    replyToId :: Maybe Int
+    text       :: Text,
+    date       :: String,
+    replyToId  :: Maybe Int
 } deriving (Eq, Show, Generic)
 
 

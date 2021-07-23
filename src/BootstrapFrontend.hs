@@ -5,21 +5,21 @@ module BootstrapFrontend where
 import           FrontendBase
 import           Lib
 
-import Data.List
-import Data.Text (pack, concat)
-
-
-import Text.Karver
-import qualified Data.HashMap.Strict as H
-import Data.Text (Text)
-import qualified Data.Vector as V
 import           Data.List
+import           Data.Text           (concat, pack)
+
+
+import qualified Data.HashMap.Strict as H
+import           Data.List
+import           Data.Text           (Text)
+import qualified Data.Vector         as V
+import           Text.Karver
 
 
 data BootstrapFrontend = BootstrapFrontend { threadsTemplate :: Text, commentsTemplate :: Text }
 
 instance Frontend BootstrapFrontend where
-    allThreadsPage (BootstrapFrontend temp _) threads = let 
+    allThreadsPage (BootstrapFrontend temp _) threads = let
             content = H.fromList [
                 ("threads", List $ V.fromList (map (Literal . name) threads)),
                 ("title", Literal "Threads") ]
