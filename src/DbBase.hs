@@ -6,12 +6,12 @@ import           Data.Functor
 import           Data.List    (sort)
 import           Lib
 
-class DB a where
-    getThreads :: a -> IO [Thread]
-    default getThreads :: a -> IO [Thread]
-    getThreads a = (getThreadsInner a) <&> (\a -> sort a)
+class Monad m => HasDB m where
+  getThreads :: m [Thread]
+  default getThreads :: m [Thread]
+  getThreads = sort <$> getThreadsInner
 
-    getThreadsInner   :: a -> IO [Thread]
-    getThreadComments :: a -> Thread -> IO [Comment]
-    addThread         :: a -> Thread -> IO ()
-    addComment        :: a -> Comment -> IO ()
+  getThreadsInner   :: m [Thread]
+  getThreadComments :: Thread -> m [Comment]
+  addThread         :: Thread -> m ()
+  addComment        :: Comment -> m ()
