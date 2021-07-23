@@ -36,6 +36,16 @@ library
       Paths_lambda_board
   hs-source-dirs:
       src
+  default-extensions:
+      BlockArguments
+      DataKinds
+      DeriveGeneric
+      FlexibleInstances
+      LambdaCase
+      MultiParamTypeClasses
+      OverloadedStrings
+      ScopedTypeVariables
+      TypeOperators
   build-depends:
       aeson
     , base >=4.7 && <5

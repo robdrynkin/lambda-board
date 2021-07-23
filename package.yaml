@@ -20,45 +20,55 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/githubuser/lambda-board#readme>
 
 dependencies:
-- aeson
-- base >= 4.7 && < 5
-- bytestring
-- karver
-- optparse-applicative
-- servant
-- servant-server
-- sqlite-simple
-- tasty >= 0.7
-- tasty-quickcheck
-- tasty-hunit
-- tasty-smallcheck
-- text
-- unordered-containers
-- vector
-- wai
-- warp
+  - aeson
+  - base >= 4.7 && < 5
+  - bytestring
+  - karver
+  - optparse-applicative
+  - servant
+  - servant-server
+  - sqlite-simple
+  - tasty >= 0.7
+  - tasty-quickcheck
+  - tasty-hunit
+  - tasty-smallcheck
+  - text
+  - unordered-containers
+  - vector
+  - wai
+  - warp
 
 library:
   source-dirs: src
+  default-extensions:
+    - BlockArguments
+    - DataKinds
+    - DeriveGeneric
+    - FlexibleInstances
+    - LambdaCase
+    - MultiParamTypeClasses
+    - OverloadedStrings
+    - ScopedTypeVariables
+    - TypeOperators
 
 executables:
   lambda-board-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - lambda-board
+      - lambda-board
 
 tests:
   lambda-board-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - lambda-board
+      - lambda-board

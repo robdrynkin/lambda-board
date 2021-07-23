@@ -1,12 +1,3 @@
-{-# LANGUAGE DataKinds             #-}
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE LambdaCase            #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
-{-# LANGUAGE TypeOperators         #-}
-
 module App where
 
 import           Lib
@@ -45,38 +36,36 @@ boardApi :: Proxy BoardApi
 boardApi = Proxy
 
 
-run :: DB d => Frontend f => Int -> d -> f -> IO ()
+run :: (DB d , Frontend f) => Int -> d -> f -> IO ()
 run port db frontend = do
   let settings =
         setPort port $
-        setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port)) $
+        setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port))
         defaultSettings
   runSettings settings =<< mkApp db frontend
 
-mkApp :: DB d => Frontend f => d -> f -> IO Application
-mkApp db frontend = return $ serve boardApi $ server db frontend
+mkApp :: (DB d, Frontend f) => d -> f -> IO Application
+mkApp db frontend = pure $ serve boardApi $ server db frontend
 
-server :: DB d => Frontend f => d -> f -> Server BoardApi
+server :: (DB d, Frontend f) => d -> f -> Server BoardApi
 server db frontend =
   App.getThreads db frontend :<|>
   App.getComments db frontend :<|>
   App.createThread db frontend
 
 
+getThreads :: (DB d, Frontend f) => d -> f -> Handler Text
+getThreads db frontend = liftIO do
+    threads <- DbBase.getThreads db
+    pure $ allThreadsPage frontend threads
 
 
-getThreads :: DB d => Frontend f => d -> f -> Handler Text
-getThreads db frontend = liftIO $ do
-    threads <- (DbBase.getThreads db)
-    return $ allThreadsPage frontend threads
-
-
-getComments :: DB d => Frontend f => d -> f -> Text -> Handler Text
+getComments :: (DB d, Frontend f) => d -> f -> Text -> Handler Text
 getComments db frontend threadName = liftIO $ do
     let thread = (Thread threadName 0)
     comments <- DbBase.getThreadComments db thread
     return $ threadPage frontend thread comments
 
 
-createThread :: DB d => Frontend f => d -> f -> Handler Text
-createThread db frontend = liftIO (DbBase.addThread db (Thread "asdf" 0)) >> return ""
+createThread :: (DB d, Frontend f) => d -> f -> Handler Text
+createThread db frontend = liftIO (DbBase.addThread db (Thread "asdf" 0)) >> pure ""
