@@ -42,8 +42,8 @@ frontend = do
     return $ BootstrapFrontend threadsTemplate commentsTemplate
 
 
-parseArg :: IO CLI
-parseArg = do
+parseArgs :: IO CLI
+parseArgs = do
   let opts = info (sample <**> helper)
         ( fullDesc
         <> progDesc "Lalambda board app"
