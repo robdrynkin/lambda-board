@@ -33,7 +33,7 @@ sample = CLI
 
 
 get_db :: String -> LiteDb
-get_db f = LiteDb $ open f
+get_db f = MkLiteDb $ open f
 
 frontend :: IO BootstrapFrontend
 frontend = do
