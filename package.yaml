@@ -33,6 +33,11 @@ dependencies:
 - bytestring
 # - postgresql-simple
 - sqlite-simple
+- karver
+- unordered-containers
+- text
+- vector
+- pandoc
 
 library:
   source-dirs: src

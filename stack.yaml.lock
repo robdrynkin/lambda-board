@@ -10,4 +10,11 @@ snapshots:
     sha256: 694573e96dca34db5636edb1fe6c96bb233ca0f9fb96c1ead1671cdfa9bd73e9
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/3.yaml
     size: 585603
-packages: []
+packages:
+- original:
+    hackage: karver-0.1.2@sha256:ee99a21567b04d5ee4f55dfb20ebbf466e8183c56af22e10878947f60cc32c4d,1755
+  completed:
+    pantry-tree:
+      sha256: 9f757fd4d31e07c8239380402f06adb5da66fb9635576102f7ab162c7b1eaa78
+      size: 391
+    hackage: karver-0.1.2@sha256:ee99a21567b04d5ee4f55dfb20ebbf466e8183c56af22e10878947f60cc32c4d,1755
