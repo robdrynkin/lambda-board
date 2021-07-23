@@ -79,4 +79,4 @@ getComments db frontend threadName = liftIO $ do
 
 
 createThread :: DB d => Frontend f => d -> f -> Handler Text
-createThread db frontend = return ""
+createThread db frontend = liftIO (DbBase.addThread db (Thread "asdf")) >> return ""
