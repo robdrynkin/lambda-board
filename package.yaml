@@ -37,7 +37,6 @@ dependencies:
 - unordered-containers
 - text
 - vector
-- pandoc
 
 library:
   source-dirs: src

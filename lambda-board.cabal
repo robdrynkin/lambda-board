@@ -41,7 +41,6 @@ library
     , base >=4.7 && <5
     , bytestring
     , karver
-    , pandoc
     , servant
     , servant-server
     , sqlite-simple
@@ -69,7 +68,6 @@ executable lambda-board-exe
     , bytestring
     , karver
     , lambda-board
-    , pandoc
     , servant
     , servant-server
     , sqlite-simple
@@ -98,7 +96,6 @@ test-suite lambda-board-test
     , bytestring
     , karver
     , lambda-board
-    , pandoc
     , servant
     , servant-server
     , sqlite-simple
