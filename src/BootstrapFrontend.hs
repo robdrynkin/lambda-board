@@ -31,8 +31,8 @@ instance Frontend BootstrapFrontend where
             parseComment comment = Object $ H.fromList [
                 ("id", (pack . show . id_) comment),
                 ("text", text comment),
-                ("replyTo", (pack . show . replyToId) comment)
-                -- ("date", date comment)
+                ("replyTo", (pack . show . replyToId) comment),
+                ("date", date comment)
             ];
             content = H.fromList [
                 ("title", Literal (name thread)),

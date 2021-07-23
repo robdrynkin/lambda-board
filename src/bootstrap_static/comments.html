@@ -10,19 +10,61 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     </head>
     <body>
+
         <div class="container">
             <menu id="nav-main">
             <div class="list-group">
                 {% for comment in comments %}
-                    <div class="d-flex w-100 justify-content-between" id="comment_{{ comment.id }}">
+                    <div style="margin-top: 20px;" class="d-flex w-100 justify-content-between" id="comment_{{ comment.id }}">
                         <h5 class="mb-1"> Аноним </h5>
-                        <small><a href="#comment_{{ comment.id }}">Comment id: {{ comment.id }} </a></small>
+                        <small>
+                            <a href="#comment_{{ comment.id }}">Comment id: {{ comment.id }} </a> <br>
+                            <a href="#comment_{{ comment.replyTo }}"> Reply to: {{ comment.replyTo }} </a> <br>
+                        </small>
                     </div>
+
                     <p class="mb-1"> {{ comment.text }} </p>
-                    <small> <a href="#comment_{{ comment.replyTo }}"> Reply to: {{ comment.replyTo }} </a> </small>
+
+                    <button type="button" onclick="set_reply_id();" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal">Reply</button>
                 {% endfor %}
             </div>
+            
+            <button style="width: 100%; margin-top: 40px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal"> New comment </button>
+            
             </menu>
         </div>
+
+        <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="replyModalLabel">Add comment</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="">
+                        <div class="mb-3">
+                          <label for="commentText" class="form-label">Text</label>
+                          <input type="text" class="form-control" id="commentText" aria-describedby="commentTextHelp">
+
+                          <input type="text" style="display: none;" class="form-control" id="threadName" value="{{ title }}">
+                          <input type="text" style="display: none;" class="form-control" id="replyToId">                          
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <script>
+            $('#myButton').on('click', function(event) {
+                // event.preventDefault(); // To prevent following the link (optional)
+                alert("asdf");
+            });
+
+        </script>
+
+
     </body>
 </html>

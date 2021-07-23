@@ -16,7 +16,7 @@ data Comment = Comment {
     id_        :: Int,
     threadName :: Text,
     text       :: Text,
-    date       :: String,
+    date       :: Text,
     replyToId  :: Maybe Int
 } deriving (Eq, Show, Generic)
 

@@ -32,4 +32,4 @@ instance DB LiteDb where
         execute c "INSERT INTO comments (id, threadName, text, date, replyToId) VALUES (?,?,?,?,?)" comment
 
     addThread (LiteDb conn) thread = conn >>= \c ->
-        execute c "INSERT INTO threads (threadName) VALUES (?)" thread
+        execute c "INSERT INTO threads (name) VALUES (?)" thread
