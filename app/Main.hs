@@ -32,8 +32,8 @@ sample = CLI
          <> metavar "INT" )
 
 
-get_db :: String -> LiteDb
-get_db f = MkLiteDb $ open f
+getDb :: String -> IO LiteDb
+getDb f = MkLiteDb <$> open f
 
 frontend :: IO BootstrapFrontend
 frontend = do
@@ -52,8 +52,9 @@ parseArgs = do
 
 main :: IO ()
 main = do
-    (CLI db port) <- parseArgs
+    CLI dbName port <- parseArgs
     f <- frontend
     putStrLn "Starting..."
-    _ <- runReaderT (run port f) (get_db db)
+    dbc <- getDb dbName
+    _ <- runReaderT (run port f) dbc
     pure ()
