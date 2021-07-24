@@ -53,6 +53,7 @@ library
       aeson
     , base >=4.7 && <5
     , bytestring
+    , file-embed
     , http-api-data
     , karver
     , mtl
@@ -84,6 +85,7 @@ executable lambda-board-exe
       aeson
     , base >=4.7 && <5
     , bytestring
+    , file-embed
     , http-api-data
     , karver
     , lambda-board
@@ -117,6 +119,7 @@ test-suite lambda-board-test
       aeson
     , base >=4.7 && <5
     , bytestring
+    , file-embed
     , http-api-data
     , karver
     , lambda-board

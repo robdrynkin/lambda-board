@@ -26,6 +26,7 @@ dependencies:
   - http-api-data
   - karver
   - mtl
+  - file-embed
   - optparse-applicative
   - servant
   - servant-server

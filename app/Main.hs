@@ -1,15 +1,21 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Main where
 
 import           App
 
 import           BootstrapFrontend
+import           Control.Monad.Reader
+import           Data.FileEmbed
+import           Data.Maybe
 import           Data.Semigroup         ((<>))
+import           Data.Text
+import           Data.Text.Encoding     (decodeUtf8)
 import qualified Data.Text.IO           as T
 import           Database.SQLite.Simple
 import           Lib
 import           Options.Applicative
 import           SqliteDb
-import           Control.Monad.Reader
 
 
 data CLI = CLI {
@@ -37,8 +43,8 @@ getDb f = MkLiteDb <$> open f
 
 frontend :: IO BootstrapFrontend
 frontend = do
-    threadsTemplate <- T.readFile "src/bootstrap_static/threads.html"
-    commentsTemplate <- T.readFile "src/bootstrap_static/comments.html"
+    let threadsTemplate = decodeUtf8 $ fromJust $(embedFileIfExists "src/bootstrap_static/threads.html")
+    let commentsTemplate = decodeUtf8 $ fromJust $(embedFileIfExists "src/bootstrap_static/comments.html")
     return $ BootstrapFrontend threadsTemplate commentsTemplate
 
 
