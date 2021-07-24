@@ -9,11 +9,10 @@ import           Data.Text                      (Text)
 import           Database.SQLite.Simple
 import           Database.SQLite.Simple.FromRow
 import           Debug.Trace
-import           Servant                        (ServerError (ServerError),
-                                                 err404, throwError)
+import           Servant
 
 
-newtype LiteDb = MkLiteDb { unLiteDb :: IO Connection }
+newtype LiteDb = MkLiteDb { unLiteDb :: Connection }
 
 instance FromRow Thread where
     fromRow = Thread <$> field <*> field
@@ -28,22 +27,25 @@ instance ToRow InsertComment where
 
 instance (Monad m, MonadError ServerError m, MonadIO m, MonadReader LiteDb m) => HasDB m where
     getThreadsInner = do
-        conn <- asks unLiteDb >>= liftIO
+        conn <- asks unLiteDb
         liftIO $ query_ conn "select * from threads"
 
     getThreadComments threadName = do
-        conn <- asks unLiteDb >>= liftIO
+        conn <- asks unLiteDb
         r <- liftIO $ query @(Only Text) @(Only Int) conn "select 1 from threads where name == (?)" (Only threadName)
         case r of
           [] -> throwError err404
           _  -> liftIO $ query conn "select * from comments where threadName == (?)" (Only threadName)
 
     addComment comment = do
-      conn <- asks unLiteDb >>= liftIO
+      conn <- asks unLiteDb
       liftIO do
         execute conn "INSERT INTO comments (threadName, text, date, replyToId) VALUES (?,?,?,?)" comment
         execute conn "UPDATE threads SET ncomments = ncomments + 1 WHERE name == (?)" (Only (ithreadName comment))
 
     addThread threadName = do
-        conn <- asks unLiteDb >>= liftIO
-        liftIO $ execute conn "INSERT INTO threads (name, ncomments) VALUES (?,?)" (Thread threadName 0)
+        conn <- asks unLiteDb
+        r <- liftIO $ query @(Only Text) @(Only Int) conn "select 1 from threads where name == (?)" (Only threadName)
+        case r of
+          [] -> liftIO $ execute conn "INSERT INTO threads (name, ncomments) VALUES (?,?)" (Thread threadName 0)
+          _  -> throwError err400

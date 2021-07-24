@@ -80,9 +80,7 @@ server frontend = App.getThreads frontend
 
 
 getThreads :: Frontend f => f -> AppM Text
-getThreads frontend = do
-    threads <- DbBase.getThreads
-    pure  $ allThreadsPage frontend threads
+getThreads frontend = allThreadsPage frontend <$> DbBase.getThreads
 
 
 getComments :: Frontend f => f -> Text -> AppM Text
@@ -93,12 +91,12 @@ getComments frontend threadName = do
 redirect :: Text -> Redirect
 redirect a = addHeader a NoContent
 
-createThread :: (Frontend f) => f -> CreateThreadForm -> AppM Redirect
+createThread :: Frontend f => f -> CreateThreadForm -> AppM Redirect
 createThread frontend (CreateThreadForm threadName) = do
     DbBase.addThread threadName
     pure $ redirect ("thread/" <> threadName)
 
-message :: (Frontend f) => f -> MessageForm -> AppM Redirect
+message :: Frontend f => f -> MessageForm -> AppM Redirect
 message frontend (MessageForm commentText threadName replyToId) = do
     date <- liftIO getZonedTime
     let (id_ :: Maybe Int) = readMaybe (unpack replyToId)
