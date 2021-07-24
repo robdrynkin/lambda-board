@@ -19,11 +19,12 @@ import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Servant
 import           Servant.API                (StdMethod (POST))
+import           Servant.Server.StaticFiles
 import           SqliteDb
 import           System.IO
+import           Text.HTML.SanitizeXSS
 import           Text.Read
 import           Web.FormUrlEncoded         (FromForm)
-import Text.HTML.SanitizeXSS
 
 
 type AppM = ReaderT LiteDb Handler
@@ -54,6 +55,8 @@ type BoardApi = Get '[HTML] Text
    :<|> "thread" :> Capture "name" Text :> Get '[HTML] Text
    :<|> "create_thread" :> ReqBody '[FormUrlEncoded] CreateThreadForm :> Verb 'POST 301 '[HTML] Redirect
    :<|> "message" :> ReqBody '[FormUrlEncoded] MessageForm :> Verb 'POST 301 '[HTML] Redirect
+   :<|> "static" :> Raw
+
 
 boardApi :: Proxy BoardApi
 boardApi = Proxy
@@ -79,6 +82,7 @@ server frontend = App.getThreads frontend
   :<|> App.getComments frontend
   :<|> App.createThread frontend
   :<|> App.message frontend
+  :<|> serveDirectoryWebApp "static"
 
 
 getThreads :: Frontend f => f -> AppM Text
