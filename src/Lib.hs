@@ -24,6 +24,13 @@ data Comment = Comment {
     replyToId  :: Maybe Int
 } deriving (Eq, Show, Generic)
 
+data InsertComment = InsertComment {
+    ithreadName :: Text,
+    itext       :: Text,
+    idate       :: Text,
+    ireplyToId  :: Maybe Int
+} deriving (Eq, Show, Generic)
+
 
 instance ToJSON Thread
 instance FromJSON Thread

@@ -22,8 +22,8 @@ instance ToRow Thread where
 
 instance FromRow Comment where
   fromRow = Comment <$> field <*> field <*> field <*> field <*> field
-instance ToRow Comment where
-    toRow (Comment id_ threadName text date replyToId) = toRow (id_, threadName, text, date, replyToId)
+instance ToRow InsertComment where
+    toRow (InsertComment threadName text date replyToId) = toRow (threadName, text, date, replyToId)
 
 
 instance (Monad m, MonadError ServerError m, MonadIO m, MonadReader LiteDb m) => HasDB m where
@@ -41,8 +41,8 @@ instance (Monad m, MonadError ServerError m, MonadIO m, MonadReader LiteDb m) =>
     addComment comment = do
       conn <- asks unLiteDb >>= liftIO
       liftIO do
-        execute conn "INSERT INTO comments (id, threadName, text, date, replyToId) VALUES (?,?,?,?,?)" comment
-        execute conn "UPDATE threads SET ncomments = ncomments + 1 WHERE threadName = (?)" (Only (threadName comment))
+        execute conn "INSERT INTO comments (threadName, text, date, replyToId) VALUES (?,?,?,?)" comment
+        execute conn "UPDATE threads SET ncomments = ncomments + 1 WHERE name == (?)" (Only (ithreadName comment))
 
     addThread threadName = do
         conn <- asks unLiteDb >>= liftIO

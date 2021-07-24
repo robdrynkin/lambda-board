@@ -65,6 +65,7 @@ library
     , tasty-quickcheck
     , tasty-smallcheck
     , text
+    , time
     , unordered-containers
     , vector
     , wai
@@ -95,6 +96,7 @@ executable lambda-board-exe
     , tasty-quickcheck
     , tasty-smallcheck
     , text
+    , time
     , unordered-containers
     , vector
     , wai
@@ -126,6 +128,7 @@ test-suite lambda-board-test
     , tasty-quickcheck
     , tasty-smallcheck
     , text
+    , time
     , unordered-containers
     , vector
     , wai

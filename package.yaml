@@ -23,18 +23,19 @@ dependencies:
   - aeson
   - base >= 4.7 && < 5
   - bytestring
+  - http-api-data
   - karver
   - mtl
   - optparse-applicative
   - servant
-  - http-api-data
   - servant-server
   - sqlite-simple
   - tasty >= 0.7
-  - tasty-quickcheck
   - tasty-hunit
+  - tasty-quickcheck
   - tasty-smallcheck
   - text
+  - time
   - unordered-containers
   - vector
   - wai

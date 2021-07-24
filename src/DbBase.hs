@@ -15,4 +15,4 @@ class Monad m => HasDB m where
     getThreadsInner   :: m [Thread]
     getThreadComments :: Text -> m [Comment]
     addThread         :: Text -> m ()
-    addComment        :: Comment -> m ()
+    addComment        :: InsertComment -> m ()

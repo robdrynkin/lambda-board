@@ -1,3 +1,5 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+
 module App where
 
 import           Lib
@@ -11,6 +13,7 @@ import           Data.Aeson
 import           Data.ByteString.Lazy.Char8 as C (fromStrict, pack)
 import           Data.Text
 import           Data.Text.Encoding         (encodeUtf8)
+import           Data.Time.LocalTime
 import           GHC.Generics
 import           Network.Wai
 import           Network.Wai.Handler.Warp
@@ -18,6 +21,7 @@ import           Servant
 import           Servant.API                (StdMethod (POST))
 import           SqliteDb
 import           System.IO
+import           Text.Read
 import           Web.FormUrlEncoded         (FromForm)
 
 type AppM = ReaderT LiteDb Handler
@@ -35,14 +39,19 @@ instance MimeRender HTML Text where
 type Redirect = (Headers '[Header "Location" Text] NoContent)
 
 data CreateThreadForm = CreateThreadForm { threadName :: Text } deriving (Eq, Show, Generic)
+data MessageForm = MessageForm {
+    commentText :: Text,
+    threadName  :: Text,
+    replyToId   :: Text
+} deriving (Eq, Show, Generic)
 
 instance FromForm CreateThreadForm
+instance FromForm MessageForm
 
-type BoardApi =
-  Get '[HTML] Text :<|>
-  "thread" :> Capture "name" Text :> Get '[HTML] Text :<|>
-  "create_thread" :> ReqBody '[FormUrlEncoded] CreateThreadForm :>
-      Verb 'POST 301 '[HTML] Redirect
+type BoardApi = Get '[HTML] Text
+   :<|> "thread" :> Capture "name" Text :> Get '[HTML] Text
+   :<|> "create_thread" :> ReqBody '[FormUrlEncoded] CreateThreadForm :> Verb 'POST 301 '[HTML] Redirect
+   :<|> "message" :> ReqBody '[FormUrlEncoded] MessageForm :> Verb 'POST 301 '[HTML] Redirect
 
 boardApi :: Proxy BoardApi
 boardApi = Proxy
@@ -64,10 +73,10 @@ mkApp frontend = do
     hoistServerWithContext boardApi (Proxy :: Proxy '[]) (`runReaderT` db) $ server frontend
 
 server :: Frontend f => f -> ServerT BoardApi AppM
-server frontend =
-  App.getThreads frontend :<|>
-  App.getComments frontend :<|>
-  App.createThread frontend
+server frontend = App.getThreads frontend
+  :<|> App.getComments frontend
+  :<|> App.createThread frontend
+  :<|> App.message frontend
 
 
 getThreads :: Frontend f => f -> AppM Text
@@ -87,4 +96,11 @@ redirect a = addHeader a NoContent
 createThread :: (Frontend f) => f -> CreateThreadForm -> AppM Redirect
 createThread frontend (CreateThreadForm threadName) = do
     DbBase.addThread threadName
+    pure $ redirect ("thread/" <> threadName)
+
+message :: (Frontend f) => f -> MessageForm -> AppM Redirect
+message frontend (MessageForm commentText threadName replyToId) = do
+    date <- liftIO getZonedTime
+    let (id_ :: Maybe Int) = readMaybe (unpack replyToId)
+    DbBase.addComment (InsertComment threadName commentText (Data.Text.pack (show date)) id_)
     pure $ redirect ("thread/" <> threadName)
