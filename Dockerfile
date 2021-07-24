@@ -1,9 +1,9 @@
 FROM haskell:8.10
 
 WORKDIR /lambda-board
+COPY . .
+RUN stack build --system-ghc
 
-COPY . /lambda-board
+ENTRYPOINT ["stack", "run", "--"]
+CMD ["-d", "./test.db", "-p", "3000"]
 
-RUN stack build
-
-CMD ["bash", "run.sh"]
