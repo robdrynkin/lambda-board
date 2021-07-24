@@ -1,14 +1,19 @@
-FROM haskell:8.10
+FROM haskell:8.10 as builder
 
 WORKDIR /lambda-board
 
-COPY stack.yaml .
-COPY stack.yaml.lock .
-RUN stack install
+COPY package.yaml .
+RUN awk '/dependencies/{a=1;next} a && /^$/{exit} a{print $2}' package.yaml | \
+		xargs stack build --system-ghc
 
 COPY . .
-RUN stack build --system-ghc
+RUN stack install --system-ghc
 
-ENTRYPOINT ["stack", "run", "--"]
+
+FROM haskell:8.10 as runner
+
+COPY --from=builder /root/.local/bin/lambda-board-exe /lambda
+
+ENTRYPOINT ["/lambda"]
 CMD ["-d", "./test.db", "-p", "3000"]
 

@@ -37,4 +37,3 @@ services:
       - "traefik.http.routers.board.rule=Host(`$DOMAIN`)"
       - "traefik.http.routers.board.entrypoints=websecure"
       - "traefik.http.routers.board.tls.certresolver=myresolver"
-
