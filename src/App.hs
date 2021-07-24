@@ -62,27 +62,27 @@ boardApi :: Proxy BoardApi
 boardApi = Proxy
 
 
-run :: (MonadIO m, MonadReader LiteDb m, Frontend f) => Int -> f -> m ()
-run port frontend = do
+run :: (MonadIO m, MonadReader LiteDb m, Frontend f) => Text -> Int -> f -> m ()
+run static port frontend = do
   let settings =
         setPort port $
         setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port))
         defaultSettings
-  app <- mkApp frontend
+  app <- mkApp static frontend
   liftIO $ runSettings settings app
 
-mkApp :: (MonadIO m, MonadReader LiteDb m, Frontend f) => f -> m Application
-mkApp frontend = do
+mkApp :: (MonadIO m, MonadReader LiteDb m, Frontend f) => Text -> f -> m Application
+mkApp static frontend = do
   db <- ask @LiteDb
   pure $ serveWithContext boardApi EmptyContext $
-    hoistServerWithContext boardApi (Proxy :: Proxy '[]) (`runReaderT` db) $ server frontend
+    hoistServerWithContext boardApi (Proxy :: Proxy '[]) (`runReaderT` db) $ server static frontend
 
-server :: Frontend f => f -> ServerT BoardApi AppM
-server frontend = App.getThreads frontend
+server :: Frontend f => Text -> f -> ServerT BoardApi AppM
+server static frontend = App.getThreads frontend
   :<|> App.getComments frontend
   :<|> App.createThread frontend
   :<|> App.message frontend
-  :<|> serveDirectoryWebApp "static"
+  :<|> serveDirectoryWebApp (Data.Text.unpack static)
 
 
 getThreads :: Frontend f => f -> AppM Text

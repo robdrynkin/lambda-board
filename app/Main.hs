@@ -18,10 +18,10 @@ import           Options.Applicative
 import           SqliteDb
 
 
-data CLI = CLI {
-  db   :: String,
-  port :: Int
-}
+data CLI = CLI { db     :: Text
+               , port   :: Int
+               , static :: Text
+               }
 
 
 sample :: Parser CLI
@@ -29,17 +29,22 @@ sample = CLI
       <$> strOption
           ( long "db"
          <> short 'd'
-         <> metavar "FILE"
-         <> help "File for sqlite db" )
+         <> help "File for sqlite db"
+         <> metavar "FILE" )
       <*> option auto
           ( long "port"
          <> short 'p'
          <> help "Port for board to listen to"
          <> metavar "INT" )
+      <*> strOption
+          ( long "static"
+         <> short 's'
+         <> help "Directory with static files"
+         <> metavar "FILE" )
 
 
-getDb :: String -> IO LiteDb
-getDb f = MkLiteDb <$> open f
+getDb :: Text -> IO LiteDb
+getDb f = MkLiteDb <$> open (Data.Text.unpack f)
 
 frontend :: IO BootstrapFrontend
 frontend = do
@@ -58,9 +63,9 @@ parseArgs = do
 
 main :: IO ()
 main = do
-    CLI dbName port <- parseArgs
+    CLI dbName port static <- parseArgs
     f <- frontend
     putStrLn "Starting..."
     dbc <- getDb dbName
-    _ <- runReaderT (run port f) dbc
+    _ <- runReaderT (run static port f) dbc
     pure ()
