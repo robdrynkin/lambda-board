@@ -53,10 +53,10 @@
                     <form method="post" action="">
                         <div class="mb-3">
                           <label for="commentText" class="form-label">Text</label>
-                          <input type="text" class="form-control" id="commentText" aria-describedby="commentTextHelp">
+                          <input type="text" class="form-control" name="commentText" aria-describedby="commentTextHelp">
 
-                          <input type="text" style="display: none;" class="form-control" id="threadName" value="{{ title }}">
-                          <input type="text" style="display: none;" class="form-control" id="replyToId">                          
+                          <input type="text" style="display: none;" class="form-control" name="threadName" value="{{ title }}">
+                          <input type="text" style="display: none;" class="form-control" name="replyToId">                          
                         </div>
                         <button type="submit" class="btn btn-primary">Create</button>
                     </form>
