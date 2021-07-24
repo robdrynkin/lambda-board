@@ -1,6 +1,11 @@
 FROM haskell:8.10
 
 WORKDIR /lambda-board
+
+COPY stack.yaml .
+COPY stack.yaml.lock .
+RUN stack install
+
 COPY . .
 RUN stack build --system-ghc
 
