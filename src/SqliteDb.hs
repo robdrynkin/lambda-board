@@ -3,9 +3,14 @@ module SqliteDb where
 import           DbBase
 import           Lib
 
+import           Control.Monad.Error.Class
 import           Control.Monad.Reader
+import           Data.Text                      (Text)
 import           Database.SQLite.Simple
 import           Database.SQLite.Simple.FromRow
+import           Debug.Trace
+import           Servant                        (ServerError (ServerError),
+                                                 err404, throwError)
 
 
 newtype LiteDb = MkLiteDb { unLiteDb :: IO Connection }
@@ -21,14 +26,17 @@ instance ToRow Comment where
     toRow (Comment id_ threadName text date replyToId) = toRow (id_, threadName, text, date, replyToId)
 
 
-instance (Monad m, MonadIO m, MonadReader LiteDb m) => HasDB m where
+instance (Monad m, MonadError ServerError m, MonadIO m, MonadReader LiteDb m) => HasDB m where
     getThreadsInner = do
         conn <- asks unLiteDb >>= liftIO
         liftIO $ query_ conn "select * from threads"
 
     getThreadComments threadName = do
         conn <- asks unLiteDb >>= liftIO
-        liftIO $ query conn "select * from comments where threadName == (?)" (Only threadName)
+        r <- liftIO $ query @(Only Text) @(Only Int) conn "select 1 from threads where name == (?)" (Only threadName)
+        case r of
+          [] -> throwError err404
+          _  -> liftIO $ query conn "select * from comments where threadName == (?)" (Only threadName)
 
     addComment comment = do
       conn <- asks unLiteDb >>= liftIO
