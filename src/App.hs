@@ -23,6 +23,8 @@ import           SqliteDb
 import           System.IO
 import           Text.Read
 import           Web.FormUrlEncoded         (FromForm)
+import Text.HTML.SanitizeXSS
+
 
 type AppM = ReaderT LiteDb Handler
 
@@ -94,11 +96,12 @@ redirect a = addHeader a NoContent
 createThread :: Frontend f => f -> CreateThreadForm -> AppM Redirect
 createThread frontend (CreateThreadForm threadName) = do
     DbBase.addThread threadName
-    pure $ redirect ("thread/" <> threadName)
+    pure $ redirect ("thread/" <> sanitize threadName)
 
 message :: Frontend f => f -> MessageForm -> AppM Redirect
 message frontend (MessageForm commentText threadName replyToId) = do
     date <- liftIO getZonedTime
     let (id_ :: Maybe Int) = readMaybe (unpack replyToId)
-    DbBase.addComment (InsertComment threadName commentText (Data.Text.pack (show date)) id_)
+    let sanitizedComment = sanitize commentText
+    DbBase.addComment (InsertComment threadName sanitizedComment (Data.Text.pack (show date)) id_)
     pure $ redirect ("thread/" <> threadName)
