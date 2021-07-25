@@ -1,4 +1,5 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module Main where
 
@@ -10,19 +11,19 @@ import           Data.Maybe
 import           Data.Semigroup                     ((<>))
 import           Data.Text                          (Text)
 import qualified Data.Text                          as T
-import           Data.Text.Encoding     (decodeUtf8)
+import           Data.Text.Encoding                 (decodeUtf8)
 import qualified Data.Text.IO                       as T
-import           Database.SQLite.Simple
-import           Options.Applicative
+import           Database.PostgreSQL.Simple
 import           Network.Wai
 import           Network.Wai.Handler.Warp
-import           System.IO
+import           Options.Applicative
 import           Servant
+import           System.IO
 
 import           API
 import           App
 import           Control.Carrier.Frontend.Bootstrap
-import           Control.Carrier.ThreadDB.Sqlite
+import           Control.Carrier.ThreadDB.Postgres
 import           Lib
 
 data CLI = MkCLI
@@ -35,8 +36,8 @@ sample = MkCLI
       <$> strOption
           ( long "db"
          <> short 'd'
-         <> help "File for sqlite db"
-         <> metavar "FILE" )
+         <> help "Database "
+         <> metavar "URL" )
       <*> option auto
           ( long "port"
          <> short 'p'
@@ -48,8 +49,8 @@ sample = MkCLI
          <> help "Directory with static files"
          <> metavar "DIR" ))
 
-getDb :: Text -> IO LiteDb
-getDb f = MkLiteDb <$> open (T.unpack f)
+getDb :: Text -> IO PgDb
+getDb url = MkPgDb <$> connectPostgreSQL url
 
 frontend :: IO BootstrapFrontend
 frontend = do
@@ -75,16 +76,16 @@ main = do
   pure ()
 
 type SNT a
-  =  SqliteC (BootstrapC (ReaderC BootstrapFrontend (ReaderC LiteDb (LiftC IO)))) a
+  =  PgC (BootstrapC (ReaderC BootstrapFrontend (ReaderC PgDb (LiftC IO)))) a
   -> Servant.Handler a
 
-phi :: LiteDb -> BootstrapFrontend -> SNT a
-phi db fi hh = liftIO $ runM $ runReader db $ runReader fi $ runBootstrap $ runSqlite hh
+phi :: PgDb -> BootstrapFrontend -> SNT a
+phi db fi url = liftIO $ runM $ runReader db $ runReader fi $ runBootstrap $ runPg url
 
 runApp
   :: ( Has (Lift IO) sig m
      , Has (Reader Static) sig m
-     , Has (Reader LiteDb) sig m
+     , Has (Reader PgDb) sig m
      , Has (Reader BootstrapFrontend) sig m )
   => Int
   -> m ()
@@ -100,7 +101,7 @@ runApp port = do
 mkApp
   :: ( Has (Lift IO) sig m
      , Has (Reader Static) sig m
-     , Has (Reader LiteDb) sig m
+     , Has (Reader PgDb) sig m
      , Has (Reader BootstrapFrontend) sig m )
   => m Application
 mkApp = do

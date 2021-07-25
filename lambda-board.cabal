@@ -28,6 +28,8 @@ library
       API
       App
       Control.Carrier.Frontend.Bootstrap
+      Control.Carrier.ThreadDB.MigrateSqLiteToPostgres
+      Control.Carrier.ThreadDB.Postgres
       Control.Carrier.ThreadDB.Sqlite
       Control.Effect.Frontend
       Control.Effect.ThreadDB
@@ -65,6 +67,7 @@ library
     , karver
     , markdown
     , optparse-applicative
+    , postgresql-simple
     , servant
     , servant-server
     , sqlite-simple
@@ -104,6 +107,7 @@ executable lambda-board-exe
     , lambda-board
     , markdown
     , optparse-applicative
+    , postgresql-simple
     , servant
     , servant-server
     , sqlite-simple
@@ -141,6 +145,7 @@ test-suite lambda-board-test
     , lambda-board
     , markdown
     , optparse-applicative
+    , postgresql-simple
     , servant
     , servant-server
     , sqlite-simple

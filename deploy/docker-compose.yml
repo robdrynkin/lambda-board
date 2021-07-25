@@ -30,13 +30,19 @@ services:
   board:
     image: robdrynkin/lambda-board:latest
     container_name: "board"
-    command: --db /test.db --port 80 --static /static
+    command: --db "postgres://postgres@postgres/database" --port 80 --static /static
     ports:
       - "80"
-    volumes:
-      - "/root/test.db:/test.db"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.board.rule=Host(`$DOMAIN`)"
       - "traefik.http.routers.board.entrypoints=websecure"
       - "traefik.http.routers.board.tls.certresolver=myresolver"
+
+  postgres:
+    image: postgres:13-alpine
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=database
+    volumes:
+      -/root/pg_db:/var/lib/postgresql/data
