@@ -25,7 +25,6 @@ import           Web.FormUrlEncoded                 (FromForm)
 
 import           API
 import           Control.Carrier.Frontend.Bootstrap
-import           Control.Carrier.ThreadDB.Sqlite
 import           Control.Effect.Frontend
 import           Control.Effect.ThreadDB
 import           Lib
