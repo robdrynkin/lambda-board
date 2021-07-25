@@ -35,7 +35,7 @@ instance (Has (Lift IO) sig m, Has (Reader BootstrapFrontend) sig m) => Algebra 
       pure $ renderTemplate content tt <$ ctx
 
     L (ThreadPage threadName comments) -> do
-      ct <- asks threadsTemplate
+      ct <- asks commentsTemplate
       let
         parseComment comment = Object $ HM.fromList
           [ ("id", (pack . show . id_) comment)
