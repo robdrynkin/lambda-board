@@ -8,8 +8,8 @@ import           GHC.Generics
 
 
 data Thread = Thread {
-    name      :: Text,
-    ncomments :: Int
+    name      :: !Text,
+    ncomments :: !Int
 } deriving (Eq, Show, Generic)
 
 instance Ord Thread where
@@ -17,18 +17,18 @@ instance Ord Thread where
 
 
 data Comment = Comment {
-    id_        :: Int,
-    threadName :: Text,
-    text       :: Text,
-    date       :: Text,
-    replyToId  :: Maybe Int
+    id_        :: !Int,
+    threadName :: !Text,
+    text       :: !Text,
+    date       :: !Text,
+    replyToId  :: !(Maybe Int)
 } deriving (Eq, Show, Generic)
 
 data InsertComment = InsertComment {
-    ithreadName :: Text,
-    itext       :: Text,
-    idate       :: Text,
-    ireplyToId  :: Maybe Int
+    ithreadName :: !Text,
+    itext       :: !Text,
+    idate       :: !Text,
+    ireplyToId  :: !(Maybe Int)
 } deriving (Eq, Show, Generic)
 
 

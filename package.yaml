@@ -23,10 +23,10 @@ dependencies:
   - aeson
   - base >= 4.7 && < 5
   - bytestring
+  - file-embed
+  - fused-effects
   - http-api-data
   - karver
-  - mtl
-  - file-embed
   - optparse-applicative
   - servant
   - servant-server
@@ -37,6 +37,7 @@ dependencies:
   - tasty-smallcheck
   - text
   - time
+  - transformers
   - unordered-containers
   - vector
   - wai
@@ -49,8 +50,12 @@ library:
     - BlockArguments
     - DataKinds
     - DeriveGeneric
+    - DuplicateRecordFields
     - FlexibleContexts
     - FlexibleInstances
+    - GADTs
+    - GeneralizedNewtypeDeriving
+    - KindSignatures
     - LambdaCase
     - MultiParamTypeClasses
     - OverloadedStrings
@@ -69,6 +74,9 @@ executables:
       - -with-rtsopts=-N
     dependencies:
       - lambda-board
+    default-extensions:
+      - RankNTypes
+      - TypeApplications
 
 tests:
   lambda-board-test:
