@@ -97,11 +97,15 @@ getComments frontend threadName = do
 redirect :: Text -> Redirect
 redirect a = addHeader a NoContent
 
+threadBan :: [Char]
+threadBan = "/\\#?"
+
 createThread :: Frontend f => f -> CreateThreadForm -> AppM Redirect
 createThread frontend (CreateThreadForm threadName) = do
-    let name = strip $ sanitize threadName
-    DbBase.addThread name
-    pure $ redirect ("thread/" <> name)
+    let name = Data.Text.filter (`notElem` threadBan) $ strip $ sanitize threadName
+    if name /= "" then throwError err400 else do
+        DbBase.addThread name
+        pure $ redirect ("thread/" <> name)
 
 message :: Frontend f => f -> MessageForm -> AppM Redirect
 message frontend (MessageForm commentText threadName replyToId) = do
