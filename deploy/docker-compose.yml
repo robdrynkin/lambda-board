@@ -28,7 +28,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   board:
-    image: robdrynkin/lambda-board:develop
+    image: robdrynkin/lambda-board:latest
     container_name: "board"
     command: --db /test.db --port 80 --static /static
     ports:
