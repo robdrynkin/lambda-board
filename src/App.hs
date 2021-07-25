@@ -5,6 +5,7 @@ import           Control.Carrier.Reader
 import           Control.Monad.IO.Class             (liftIO)
 import           Data.Aeson
 import           Data.ByteString.Lazy.Char8         as C (fromStrict, pack)
+import           Data.List
 import           Data.Text                          (Text)
 import qualified Data.Text                          as T
 import           Data.Text.Encoding                 (encodeUtf8)
@@ -28,7 +29,9 @@ import           Control.Effect.ThreadDB
 import           Lib
 
 handleGetThreads :: (Has (Lift IO) sig m, Has ThreadDB sig m, Has Frontend sig m) => m Text
-handleGetThreads = getThreads >>= allThreadsPage
+handleGetThreads = do
+    threads <- getThreads
+    allThreadsPage $ reverse $ sort threads
 
 handleGetComments :: (Has ThreadDB sig m, Has Frontend sig m) => Text -> m Text
 handleGetComments threadName = getComments threadName >>= threadPage threadName
