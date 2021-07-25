@@ -1,27 +1,27 @@
 runcharts:
   - title: Latency
+    position: [[0, 8], [80, 18]]
     rate-ms: 10000
-    scale: 2
     legend:
-      enabled: true
-      details: false
+        enabled: true
+        details: false
+    scale: 2
     items:
       - label: Threads page
-        sample: curl -o /dev/null -s -w '%{time_total}'  http://www.lambda-board.ru
-
+        sample: curl -o /dev/null -s -w '%{time_total}'  https://lambda-board.ru
   - title: Items
+    position: [[0, 25], [80, 16]]
     rate-ms: 10000
-    scale: 1
     legend:
-      enabled: true
-      details: false
+        enabled: true
+        details: false
+    scale: 1
     items:
       - label: Threads number
-        sample: curl -s  http://www.lambda-board.ru | grep /thread | wc -l
-
-
+        sample: curl -s  https://lambda-board.ru | grep /thread | wc -l
 textboxes:
   - title: Top 161.35.17.177
+    position: [[0, 0], [80, 8]]
     pty: true
     init: ssh root@161.35.17.177
     sample: top

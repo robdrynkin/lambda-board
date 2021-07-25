@@ -45,6 +45,7 @@ dependencies:
   - wai
   - warp
   - xss-sanitize
+  - postgresql-simple
 
 library:
   source-dirs: src
