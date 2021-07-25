@@ -24,7 +24,7 @@ services:
       - "443:443"
       #- "8080:8080"
     volumes:
-      - "./letsencrypt:/letsencrypt"
+      - "/root/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   board:
@@ -34,7 +34,7 @@ services:
     ports:
       - "80"
     volumes:
-      - "../lalambda.db:/test.db"
+      - "/root/test.db:/test.db"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.board.rule=Host(`$DOMAIN`)"
