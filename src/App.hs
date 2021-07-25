@@ -1,116 +1,69 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-
 module App where
 
-import           Lib
-
-import           DbBase
-import           FrontendBase
-
-import           Control.Monad.IO.Class
-import           Control.Monad.Reader
+import           Control.Carrier.Lift
+import           Control.Carrier.Reader
+import           Control.Monad.IO.Class             (liftIO)
 import           Data.Aeson
-import           Data.ByteString.Lazy.Char8 as C (fromStrict, pack)
-import           Data.Text
-import           Data.Text.Encoding         (encodeUtf8)
+import           Data.ByteString.Lazy.Char8         as C (fromStrict, pack)
+import           Data.Text                          (Text)
+import qualified Data.Text                          as T
+import           Data.Text.Encoding                 (encodeUtf8)
 import           Data.Time.LocalTime
 import           GHC.Generics
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Servant
-import           Servant.API                (StdMethod (POST))
+import           Servant.API                        (StdMethod (POST))
 import           Servant.Server.StaticFiles
-import           SqliteDb
 import           System.IO
 import           Text.HTML.SanitizeXSS
 import           Text.Read
-import           Web.FormUrlEncoded         (FromForm)
+import           Web.FormUrlEncoded                 (FromForm)
 
+import           API
+import           Control.Carrier.Frontend.Bootstrap
+import           Control.Carrier.ThreadDB.Sqlite
+import           Control.Effect.Frontend
+import           Control.Effect.ThreadDB
+import           Lib
 
-type AppM = ReaderT LiteDb Handler
+handleGetThreads :: (Has (Lift IO) sig m, Has ThreadDB sig m, Has Frontend sig m) => m Text
+handleGetThreads = getThreads >>= allThreadsPage
 
--- * api
-
-data HTML
-
-instance Accept HTML where
-   contentType _ = "text/html"
-
-instance MimeRender HTML Text where
-   mimeRender _ val = fromStrict $ encodeUtf8 val
-
-type Redirect = (Headers '[Header "Location" Text] NoContent)
-
-data CreateThreadForm = CreateThreadForm { threadName :: Text } deriving (Eq, Show, Generic)
-data MessageForm = MessageForm {
-    commentText :: Text,
-    threadName  :: Text,
-    replyToId   :: Text
-} deriving (Eq, Show, Generic)
-
-instance FromForm CreateThreadForm
-instance FromForm MessageForm
-
-type BoardApi = Get '[HTML] Text
-   :<|> "thread" :> Capture "name" Text :> Get '[HTML] Text
-   :<|> "create_thread" :> ReqBody '[FormUrlEncoded] CreateThreadForm :> Verb 'POST 301 '[HTML] Redirect
-   :<|> "message" :> ReqBody '[FormUrlEncoded] MessageForm :> Verb 'POST 301 '[HTML] Redirect
-   :<|> "static" :> Raw
-
-
-boardApi :: Proxy BoardApi
-boardApi = Proxy
-
-
-run :: (MonadIO m, MonadReader LiteDb m, Frontend f) => Text -> Int -> f -> m ()
-run static port frontend = do
-  let settings =
-        setPort port $
-        setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port))
-        defaultSettings
-  app <- mkApp static frontend
-  liftIO $ runSettings settings app
-
-mkApp :: (MonadIO m, MonadReader LiteDb m, Frontend f) => Text -> f -> m Application
-mkApp static frontend = do
-  db <- ask @LiteDb
-  pure $ serveWithContext boardApi EmptyContext $
-    hoistServerWithContext boardApi (Proxy :: Proxy '[]) (`runReaderT` db) $ server static frontend
-
-server :: Frontend f => Text -> f -> ServerT BoardApi AppM
-server static frontend = App.getThreads frontend
-  :<|> App.getComments frontend
-  :<|> App.createThread frontend
-  :<|> App.message frontend
-  :<|> serveDirectoryWebApp (Data.Text.unpack static)
-
-
-getThreads :: Frontend f => f -> AppM Text
-getThreads frontend = allThreadsPage frontend <$> DbBase.getThreads
-
-
-getComments :: Frontend f => f -> Text -> AppM Text
-getComments frontend threadName = do
-    comments <- DbBase.getThreadComments threadName
-    pure $ threadPage frontend threadName comments
+handleGetComments :: (Has ThreadDB sig m, Has Frontend sig m) => Text -> m Text
+handleGetComments threadName = getComments threadName >>= threadPage threadName
 
 redirect :: Text -> Redirect
 redirect a = addHeader a NoContent
 
-threadBan :: [Char]
+threadBan :: String
 threadBan = "/\\#?"
 
-createThread :: Frontend f => f -> CreateThreadForm -> AppM Redirect
-createThread frontend (CreateThreadForm threadName) = do
-    let name = Data.Text.filter (`notElem` threadBan) $ strip $ sanitize threadName
-    if name /= "" then throwError err400 else do
-        DbBase.addThread name
-        pure $ redirect ("thread/" <> name)
+handleCreateThread :: (Has ThreadDB sig m, Has Frontend sig m) => CreateThreadForm -> m Redirect
+handleCreateThread (CreateThreadForm threadName) = do
+  let
+    name = T.filter (`notElem` threadBan) $ T.strip $ sanitize threadName
+  addThread name
+  pure $ redirect ("thread/" <> name)
 
-message :: Frontend f => f -> MessageForm -> AppM Redirect
-message frontend (MessageForm commentText threadName replyToId) = do
-    date <- liftIO getZonedTime
-    let id_ = readMaybe $ unpack replyToId
-    let sanitizedComment = sanitize commentText
-    DbBase.addComment (InsertComment threadName sanitizedComment (Data.Text.pack (show date)) id_)
+handleMessage :: (Has (Lift IO) sig m, Has ThreadDB sig m, Has Frontend sig m) => MessageForm -> m Redirect
+handleMessage (MessageForm commentText threadName replyToId) = do
+    date <- sendIO getZonedTime
+    let
+      id_ = readMaybe $ T.unpack replyToId
+      sanitizedComment = sanitize commentText
+    addComment (InsertComment threadName sanitizedComment (T.pack (show date)) id_)
     pure $ redirect ("thread/" <> threadName)
+
+server
+  :: ( Has (Lift IO) sig m
+     , Has ThreadDB sig m
+     , Has Frontend sig m)
+  => Static
+  -> ServerT BoardApi m
+server static
+  =    handleGetThreads
+  :<|> handleGetComments
+  :<|> handleCreateThread
+  :<|> handleMessage
+  :<|> serveDirectoryWebApp (T.unpack . unStatic $ static)
