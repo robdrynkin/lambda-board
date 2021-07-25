@@ -2,14 +2,18 @@ module Control.Carrier.Frontend.Bootstrap where
 
 import           Control.Algebra
 import           Control.Carrier.Lift
-import qualified Data.HashMap.Strict as HM
-import qualified Data.Vector as V
 import           Control.Carrier.Reader
 import           Control.Effect.Frontend
 import           Data.Functor
-import           GHC.Generics (Generic)
-import           Data.Kind       (Type)
+import qualified Data.HashMap.Strict           as HM
+import           Data.Kind                     (Type)
+import           Data.Maybe
 import           Data.Text
+import           Data.Text.Lazy                (toStrict)
+import qualified Data.Vector                   as V
+import           GHC.Generics                  (Generic)
+import           Text.Blaze.Html               (Html)
+import           Text.Blaze.Html.Renderer.Text
 import           Text.Karver
 
 import           Lib
@@ -37,10 +41,10 @@ instance (Has (Lift IO) sig m, Has (Reader BootstrapFrontend) sig m) => Algebra 
     L (ThreadPage threadName comments) -> do
       ct <- asks commentsTemplate
       let
-        parseComment comment = Object $ HM.fromList
+        parseComment (comment :: Comment Html) = Object $ HM.fromList
           [ ("id", (pack . show . id_) comment)
-          , ("text", text comment)
-          , ("replyTo", (pack . show . replyToId) comment)
+          , ("text", (toStrict . renderHtml . text) comment)
+          , ("replyTo", (pack . (fromMaybe "Nothing") . (show <$>) . replyToId) comment)
           , ("date", date comment) ]
         content = HM.fromList
           [ ("title", Literal threadName)

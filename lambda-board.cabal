@@ -39,6 +39,7 @@ library
   default-extensions:
       BlockArguments
       DataKinds
+      DeriveFunctor
       DeriveGeneric
       DuplicateRecordFields
       FlexibleContexts
@@ -56,11 +57,13 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , blaze-html
     , bytestring
     , file-embed
     , fused-effects
     , http-api-data
     , karver
+    , markdown
     , optparse-applicative
     , servant
     , servant-server
@@ -92,12 +95,14 @@ executable lambda-board-exe
   build-depends:
       aeson
     , base >=4.7 && <5
+    , blaze-html
     , bytestring
     , file-embed
     , fused-effects
     , http-api-data
     , karver
     , lambda-board
+    , markdown
     , optparse-applicative
     , servant
     , servant-server
@@ -127,12 +132,14 @@ test-suite lambda-board-test
   build-depends:
       aeson
     , base >=4.7 && <5
+    , blaze-html
     , bytestring
     , file-embed
     , fused-effects
     , http-api-data
     , karver
     , lambda-board
+    , markdown
     , optparse-applicative
     , servant
     , servant-server

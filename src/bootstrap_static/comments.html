@@ -14,7 +14,7 @@
         <nav class="navbar navbar-light bg-light">
             <div class="container">
               <a class="navbar-brand" href="/">
-                <img src="/static/imgs/logo.jpeg" alt="" width="30" height="24">
+                <img src="/static/imgs/logo.jpeg" alt="" width="100">
               </a>
             </div>
         </nav>
@@ -31,7 +31,7 @@
                         </small>
                     </div>
 
-                    <p class="mb-1"> {{ comment.text }} </p>
+                    {{ comment.text }}
 
                     <button type="button" onclick="set_reply_id('{{ comment.id }}');" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal">Reply</button>
                 {% endfor %}
@@ -53,7 +53,7 @@
                     <form method="post" action="/message">
                         <div class="mb-3">
                           <label for="commentText" class="form-label">Text</label>
-                          <input type="text" class="form-control" name="commentText" aria-describedby="commentTextHelp">
+                          <textarea type="text" class="form-control" name="commentText" aria-describedby="commentTextHelp" id="commentText"></textarea>
 
                           <input type="text" style="display: none;" class="form-control" name="threadName" value="{{ title }}">
                           <input type="text" style="display: none;" class="form-control" name="replyToId" id="replyToId">                          

@@ -16,13 +16,13 @@ instance Ord Thread where
     (<=) a b = ncomments a <= ncomments b
 
 
-data Comment = Comment {
+data Comment a = Comment {
     id_        :: !Int,
     threadName :: !Text,
-    text       :: !Text,
+    text       :: !a,
     date       :: !Text,
     replyToId  :: !(Maybe Int)
-} deriving (Eq, Show, Generic)
+} deriving (Eq, Show, Generic, Functor)
 
 data InsertComment = InsertComment {
     ithreadName :: !Text,
@@ -35,5 +35,5 @@ data InsertComment = InsertComment {
 instance ToJSON Thread
 instance FromJSON Thread
 
-instance ToJSON Comment
-instance FromJSON Comment
+instance ToJSON (Comment Text)
+instance FromJSON (Comment Text)

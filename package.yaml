@@ -22,11 +22,13 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
   - aeson
   - base >= 4.7 && < 5
+  - blaze-html
   - bytestring
   - file-embed
   - fused-effects
   - http-api-data
   - karver
+  - markdown
   - optparse-applicative
   - servant
   - servant-server
@@ -49,6 +51,7 @@ library:
   default-extensions:
     - BlockArguments
     - DataKinds
+    - DeriveFunctor
     - DeriveGeneric
     - DuplicateRecordFields
     - FlexibleContexts

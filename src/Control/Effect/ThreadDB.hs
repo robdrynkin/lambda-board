@@ -8,7 +8,7 @@ import           Lib
 
 data ThreadDB (m :: Type -> Type) k where
   GetThreads  :: ThreadDB m [Thread]
-  GetComments :: Text -> ThreadDB m [Comment]
+  GetComments :: Text -> ThreadDB m [Comment Text]
   AddThread   :: Text -> ThreadDB m ()
   AddComment  :: InsertComment -> ThreadDB m ()
 
@@ -16,7 +16,7 @@ getThreads :: Has ThreadDB sig m => m [Thread]
 getThreads = send GetThreads
 {-# INLINE getThreads #-}
 
-getComments :: Has ThreadDB sig m => Text -> m [Comment]
+getComments :: Has ThreadDB sig m => Text -> m [Comment Text]
 getComments = send . GetComments
 {-# INLINE getComments #-}
 

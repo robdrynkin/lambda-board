@@ -9,6 +9,7 @@ import           Data.List
 import           Data.Text                          (Text)
 import qualified Data.Text                          as T
 import           Data.Text.Encoding                 (encodeUtf8)
+import qualified Data.Text.Lazy                     as L
 import           Data.Time.LocalTime
 import           GHC.Generics
 import           Network.Wai
@@ -18,6 +19,7 @@ import           Servant.API                        (StdMethod (POST))
 import           Servant.Server.StaticFiles
 import           System.IO
 import           Text.HTML.SanitizeXSS
+import           Text.Markdown
 import           Text.Read
 import           Web.FormUrlEncoded                 (FromForm)
 
@@ -28,13 +30,17 @@ import           Control.Effect.Frontend
 import           Control.Effect.ThreadDB
 import           Lib
 
+
 handleGetThreads :: (Has (Lift IO) sig m, Has ThreadDB sig m, Has Frontend sig m) => m Text
 handleGetThreads = do
     threads <- getThreads
     allThreadsPage $ reverse $ sort threads
 
 handleGetComments :: (Has ThreadDB sig m, Has Frontend sig m) => Text -> m Text
-handleGetComments threadName = getComments threadName >>= threadPage threadName
+handleGetComments threadName = do
+    (comments :: [Comment Text]) <- getComments threadName
+    let mcomments = (markdown def { msXssProtect = True } . L.fromStrict <$>) <$> comments
+    threadPage threadName mcomments
 
 redirect :: Text -> Redirect
 redirect a = addHeader a NoContent
@@ -52,10 +58,8 @@ handleCreateThread (CreateThreadForm threadName) = do
 handleMessage :: (Has (Lift IO) sig m, Has ThreadDB sig m, Has Frontend sig m) => MessageForm -> m Redirect
 handleMessage (MessageForm commentText threadName replyToId) = do
     date <- sendIO getZonedTime
-    let
-      id_ = readMaybe $ T.unpack replyToId
-      sanitizedComment = sanitize commentText
-    addComment (InsertComment threadName sanitizedComment (T.pack (show date)) id_)
+    let id_ = readMaybe $ T.unpack replyToId
+    addComment $ InsertComment threadName commentText (T.pack $ show date) id_
     pure $ redirect ("thread/" <> threadName)
 
 server
