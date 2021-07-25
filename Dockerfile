@@ -12,9 +12,9 @@ RUN stack install --system-ghc
 
 FROM haskell:8.10
 
-COPY static .
+COPY static /
 COPY --from=builder /root/.local/bin/lambda-board-exe /lambda
 
 ENTRYPOINT ["/lambda"]
-CMD ["-d", "./test.db", "-p", "3000", "-s", "static"]
+CMD ["-d", "./test.db", "-p", "3000", "-s", "/static"]
 

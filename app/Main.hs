@@ -40,7 +40,7 @@ sample = CLI
           ( long "static"
          <> short 's'
          <> help "Directory with static files"
-         <> metavar "FILE" )
+         <> metavar "DIR" )
 
 
 getDb :: Text -> IO LiteDb

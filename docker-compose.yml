@@ -30,7 +30,7 @@ services:
   board:
     image: robdrynkin/lambda-board:develop
     container_name: "board"
-    command: --db /test.db --port 80
+    command: --db /test.db --port 80 --static /static
     ports:
       - "80"
     volumes:

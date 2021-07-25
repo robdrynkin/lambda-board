@@ -99,13 +99,14 @@ redirect a = addHeader a NoContent
 
 createThread :: Frontend f => f -> CreateThreadForm -> AppM Redirect
 createThread frontend (CreateThreadForm threadName) = do
-    DbBase.addThread threadName
-    pure $ redirect ("thread/" <> sanitize threadName)
+    let name = strip $ sanitize threadName
+    DbBase.addThread name
+    pure $ redirect ("thread/" <> name)
 
 message :: Frontend f => f -> MessageForm -> AppM Redirect
 message frontend (MessageForm commentText threadName replyToId) = do
     date <- liftIO getZonedTime
-    let (id_ :: Maybe Int) = readMaybe (unpack replyToId)
+    let id_ = readMaybe $ unpack replyToId
     let sanitizedComment = sanitize commentText
     DbBase.addComment (InsertComment threadName sanitizedComment (Data.Text.pack (show date)) id_)
     pure $ redirect ("thread/" <> threadName)
