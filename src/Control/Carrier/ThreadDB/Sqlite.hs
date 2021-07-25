@@ -19,8 +19,12 @@ instance ToRow Thread where
 
 instance FromRow (Comment Text) where
   fromRow = Comment <$> field <*> field <*> field <*> field <*> field
+
 instance ToRow InsertComment where
     toRow (InsertComment threadName text date replyToId) = toRow (threadName, text, date, replyToId)
+
+instance ToRow InsertThread where
+    toRow (InsertThread (Thread name ncomments) token) = toRow (name, ncomments, token)
 
 newtype SqliteC m a = MkSqliteC { runSqlite :: m a }
   deriving (Functor, Applicative, Monad)
@@ -31,7 +35,7 @@ instance ( Has (Lift IO) sig m, Has (Reader LiteDb) sig m ) => Algebra (ThreadDB
 
     L GetThreads -> do
       MkLiteDb conn <- ask
-      (<$ctx) <$> sendIO (query_ conn "select * from threads")
+      (<$ctx) <$> sendIO (query_ conn "select name, ncomments from threads")
 
     L (GetComments threadName) -> do
       MkLiteDb conn <- ask
@@ -46,6 +50,13 @@ instance ( Has (Lift IO) sig m, Has (Reader LiteDb) sig m ) => Algebra (ThreadDB
         execute conn "INSERT INTO comments (threadName, text, date, replyToId) VALUES (?,?,?,?)" comment
         execute conn "UPDATE threads SET ncomments = ncomments + 1 WHERE name == (?)" (Only (ithreadName comment))
 
-    L (AddThread threadName) -> (<$ctx) <$> do
+    L (AddThread (threadName, token)) -> (<$ctx) <$> do
       MkLiteDb conn <- ask
-      sendIO $ execute conn "INSERT INTO threads (name, ncomments) VALUES (?,?)" (Thread threadName 0)
+      sendIO $ execute conn "INSERT INTO threads (name, ncomments, token) VALUES (?,?,?)" (InsertThread (Thread threadName 0) token)
+
+    L (DoDeleteComment delComment) -> (<$ctx) <$> do
+      MkLiteDb conn <- ask
+      r <- sendIO $ query @(Text, Text) @(Only Int) conn "SELECT COUNT(*) FROM threads WHERE name == (?) AND token == (?) LIMIT 1" (dthreadName delComment, dtoken delComment)
+      case r of
+        [] -> pure () -- FIXME throw 404
+        _  -> sendIO $ execute conn "DELETE FROM comments WHERE id == (?) AND threadName == (?)" (dcommentId delComment, dthreadName delComment)

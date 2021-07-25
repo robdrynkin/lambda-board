@@ -1,6 +1,7 @@
 CREATE TABLE threads (
     name       TEXT NOT NULL PRIMARY KEY,
-    ncomments  INTEGER
+    ncomments  INTEGER,
+    token      VARCHAR NOT NULL UNIQUE
 );
 
 

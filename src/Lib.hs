@@ -31,9 +31,22 @@ data InsertComment = InsertComment {
     ireplyToId  :: !(Maybe Int)
 } deriving (Eq, Show, Generic)
 
+data DeleteComment = DeleteComment {
+    dcommentId  :: !Int,
+    dthreadName :: !Text,
+    dtoken      :: !Text
+} deriving (Eq, Show, Generic)
+
+data InsertThread = InsertThread {
+    itthread :: !Thread,
+    ittoken  :: !Text
+} deriving (Eq, Show)
 
 instance ToJSON Thread
 instance FromJSON Thread
 
 instance ToJSON (Comment Text)
 instance FromJSON (Comment Text)
+
+instance ToJSON DeleteComment
+instance FromJSON DeleteComment
