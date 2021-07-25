@@ -1,10 +1,18 @@
 on:
   push:
-    branches: [develop]
+    branches: [test-deploy]
+
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Do deploy'
+        required: true
+        default: false
 
 jobs:
   build_image:
     runs-on: ubuntu-20.04
+    if: false
     steps:
       - uses: actions/checkout@v2
       - name: Check Dockerhub credentials
@@ -41,3 +49,34 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  deploy:
+    #needs: build_image
+    runs-on: ubuntu-20.04
+    if: ${{ github.event.inputs.deploy }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check credentials
+        run: |
+          set -x
+          test -n "${{ secrets.DEPLOY_KEY }}"
+          test -n "${{ secrets.DEPLOY_HOST }}"
+          test -n "${{ secrets.DOMAIN }}"
+          test -n "${{ secrets.EMAIL }}"
+
+      - uses: shimataro/ssh-key-action@v2
+        with:
+          key: "${{ secrets.DEPLOY_KEY }}"
+          known_hosts: 'known_hosts'
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.DOMAIN }} >> ~/.ssh/known_hosts
+
+      - name: Deploy board
+        run: docker-compose pull && docker-compose down && docker-compose up -d
+        working-directory: deploy
+        env:
+          DOCKER_HOST: "ssh://${{ secrets.DEPLOY_HOST }}"
+          DOMAIN: "${{ secrets.DOMAIN }}"
+          EMAIL: "${{ secrets.EMAIL }}"
+          TAG: develop

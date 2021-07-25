@@ -76,3 +76,4 @@ jobs:
           DOCKER_HOST: "ssh://${{ secrets.DEPLOY_HOST }}"
           DOMAIN: "${{ secrets.DOMAIN }}"
           EMAIL: "${{ secrets.EMAIL }}"
+          TAG: latest
