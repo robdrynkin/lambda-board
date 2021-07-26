@@ -2,4 +2,6 @@
 *~
 /dist-newstyle
 /letsencrypt
+/pg
+/static/coqs/
 .env
