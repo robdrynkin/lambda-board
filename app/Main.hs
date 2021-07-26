@@ -11,7 +11,7 @@ import           Data.Maybe
 import           Data.Semigroup                     ((<>))
 import           Data.Text                          (Text)
 import qualified Data.Text                          as T
-import           Data.Text.Encoding                 (decodeUtf8)
+import           Data.Text.Encoding                 (decodeUtf8, encodeUtf8)
 import qualified Data.Text.IO                       as T
 import           Database.PostgreSQL.Simple
 import           Network.Wai
@@ -50,7 +50,7 @@ sample = MkCLI
          <> metavar "DIR" ))
 
 getDb :: Text -> IO PgDb
-getDb url = MkPgDb <$> connectPostgreSQL url
+getDb url = MkPgDb <$> connectPostgreSQL (encodeUtf8 url)
 
 frontend :: IO BootstrapFrontend
 frontend = do
