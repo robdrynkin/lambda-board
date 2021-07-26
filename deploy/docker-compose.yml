@@ -19,6 +19,7 @@ services:
       #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.email=$EMAIL"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -33,6 +34,7 @@ services:
     command: --db "postgres://postgres@postgres/database" --port 80 --static /static
     ports:
       - "80"
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.board.rule=Host(`$DOMAIN`)"
@@ -46,5 +48,6 @@ services:
       - POSTGRES_DB=database
       - POSTGRES_USER=postgres
       - POSTGRES_HOST_AUTH_METHOD=trust
+    restart: unless-stopped
     volumes:
       -/root/pg_db:/var/lib/postgresql/data
