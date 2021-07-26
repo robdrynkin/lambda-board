@@ -3,15 +3,16 @@ module Control.Carrier.ThreadDB.MigrateSqLiteToPostgres where
 import           Control.Carrier.ThreadDB.Postgres
 import           Control.Carrier.ThreadDB.Sqlite
 import           Data.ByteString
+import           Data.Text
 import           Database.PostgreSQL.Simple        as Postgres
 import           Database.PostgreSQL.Simple.ToRow  as PgToRow
 import           Database.SQLite.Simple            as Sqlite
 import           Lib
 
-data IntermediateDb = IntermediateDb [Thread] [Comment]
+data IntermediateDb = IntermediateDb [Thread] [Comment Text]
 
 
-instance PgToRow.ToRow Comment where
+instance PgToRow.ToRow (Comment Text) where
     toRow (Comment id_ threadName text date replyToId) = PgToRow.toRow (id_, threadName, text, date, replyToId)
 
 
@@ -19,7 +20,7 @@ readFromSqlite :: String -> IO IntermediateDb
 readFromSqlite dbPath = do
     conn <- open dbPath
     threads <- (Sqlite.query_ conn "select * from threads" :: IO [Thread])
-    comments <- (Sqlite.query_ conn "select * from comments" :: IO [Comment])
+    comments <- (Sqlite.query_ conn "select * from comments" :: IO [Comment Text])
     return $ IntermediateDb threads comments
 
 

@@ -18,7 +18,7 @@ instance FromRow Thread where
 instance ToRow Thread where
     toRow (Thread name ncomments) = toRow (name, ncomments)
 
-instance FromRow Comment where
+instance FromRow (Comment Text) where
     fromRow = Comment <$> field <*> field <*> field <*> field <*> field
 instance ToRow InsertComment where
     toRow (InsertComment threadName text date replyToId) = toRow (threadName, text, date, replyToId)
@@ -52,4 +52,3 @@ instance ( Has (Lift IO) sig m, Has (Reader PgDb) sig m ) => Algebra (ThreadDB :
       MkPgDb conn <- ask
       sendIO $ execute conn "INSERT INTO threads (name, ncomments) VALUES (?,?)" (Thread threadName 0)
       return ()
-
