@@ -44,7 +44,7 @@ instance (Has (Lift IO) sig m, Has (Reader BootstrapFrontend) sig m) => Algebra 
         parseComment (comment :: Comment Html) = Object $ HM.fromList
           [ ("id", (pack . show . id_) comment)
           , ("text", (toStrict . renderHtml . text) comment)
-          , ("replyTo", (pack . (fromMaybe "Nothing") . (show <$>) . replyToId) comment)
+          , ("replyTo", (pack . maybe "Nothing" show . replyToId) comment)
           , ("date", date comment) ]
         content = HM.fromList
           [ ("title", Literal threadName)

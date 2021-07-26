@@ -20,8 +20,7 @@ readFromSqlite :: String -> IO IntermediateDb
 readFromSqlite dbPath = do
     conn <- open dbPath
     threads <- (Sqlite.query_ conn "select * from threads" :: IO [Thread])
-    comments <- (Sqlite.query_ conn "select * from comments" :: IO [Comment Text])
-    return $ IntermediateDb threads comments
+    IntermediateDb threads <$> (Sqlite.query_ conn "select * from comments" :: IO [Comment Text])
 
 
 writeToPostgres :: ByteString -> IntermediateDb -> IO ()
