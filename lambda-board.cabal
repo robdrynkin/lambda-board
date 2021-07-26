@@ -53,6 +53,7 @@ library
       MultiParamTypeClasses
       OverloadedStrings
       ScopedTypeVariables
+      StandaloneDeriving
       TypeApplications
       TypeOperators
       UndecidableInstances
@@ -96,7 +97,10 @@ executable lambda-board-exe
   hs-source-dirs:
       app
   default-extensions:
+      FlexibleInstances
+      GeneralizedNewtypeDeriving
       RankNTypes
+      StandaloneDeriving
       TypeApplications
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:

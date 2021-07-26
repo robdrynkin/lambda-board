@@ -1,6 +1,7 @@
 module Control.Carrier.Frontend.Bootstrap where
 
 import           Control.Algebra
+import           Control.Monad.Random
 import           Control.Carrier.Lift
 import           Control.Carrier.Reader
 import           Control.Effect.Frontend
@@ -24,7 +25,7 @@ data BootstrapFrontend = BootstrapFrontend
   deriving (Generic)
 
 newtype BootstrapC m a = MkBootstrapC { runBootstrap :: m a }
-  deriving (Functor, Applicative, Monad)
+  deriving (Functor, Applicative, Monad, MonadRandom)
 
 instance (Has (Lift IO) sig m, Has (Reader BootstrapFrontend) sig m) => Algebra (Frontend :+: sig) (BootstrapC m) where
   alg hdl sig ctx = case sig of

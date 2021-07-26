@@ -4,6 +4,8 @@
 module Main where
 
 import           Control.Carrier.Lift
+import           Control.Monad.Random
+import qualified Control.Monad.Trans.Reader as R
 import           Control.Carrier.Reader
 import           Control.Monad.IO.Class
 import           Data.FileEmbed
@@ -25,6 +27,10 @@ import           App
 import           Control.Carrier.Frontend.Bootstrap
 import           Control.Carrier.ThreadDB.Postgres
 import           Lib
+
+instance MonadRandom m => MonadRandom (ReaderC r m) where
+  getRandomR (x, y) = ReaderC $ \r -> getRandomR (x, y)
+deriving instance MonadRandom (LiftC IO)
 
 data CLI = MkCLI
   { db     :: !Text
@@ -86,7 +92,8 @@ runApp
   :: ( Has (Lift IO) sig m
      , Has (Reader Static) sig m
      , Has (Reader PgDb) sig m
-     , Has (Reader BootstrapFrontend) sig m )
+     , Has (Reader BootstrapFrontend) sig m
+     , MonadRandom m)
   => Int
   -> m ()
 runApp port = do
@@ -102,7 +109,8 @@ mkApp
   :: ( Has (Lift IO) sig m
      , Has (Reader Static) sig m
      , Has (Reader PgDb) sig m
-     , Has (Reader BootstrapFrontend) sig m )
+     , Has (Reader BootstrapFrontend) sig m
+     , MonadRandom m )
   => m Application
 mkApp = do
   static <- ask
