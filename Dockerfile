@@ -1,11 +1,14 @@
-FROM haskell:8.10.4-buster as builder
-
-WORKDIR /lambda-board
+FROM haskell:8.10.4-buster as deps
 
 RUN set -ex; \
     apt-get update  -yq; \
-    apt-get install -y --no-install-recommends libpq-dev; \
+    apt-get install -y --no-install-recommends libpq-dev tar; \
     rm -rf /var/lib/apt/lists/*
+
+
+FROM deps as builder
+
+WORKDIR /lambda-board
 
 COPY package.yaml .
 
@@ -16,15 +19,15 @@ COPY . .
 RUN stack install --system-ghc
 
 
-FROM haskell:8.10.4-buster
-
-RUN set -ex; \
-    apt-get update  -yq; \
-    apt-get install -y --no-install-recommends libpq-dev; \
-    rm -rf /var/lib/apt/lists/*
+FROM deps
 
 RUN mkdir /static
 COPY static /static
+WORKDIR /static
+RUN set -ex; \
+    base64 -d s.b | tar xzf -
+
+WORKDIR /
 COPY --from=builder /root/.local/bin/lambda-board-exe /lambda
 
 ENTRYPOINT ["/lambda"]

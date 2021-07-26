@@ -13,6 +13,7 @@ import qualified Data.Text                          as T
 import           Data.Text.Encoding                 (encodeUtf8)
 import qualified Data.Text.Lazy                     as L
 import           Data.Time.LocalTime
+import           Debug.Trace
 import           GHC.Generics
 import           Network.Wai
 import           Network.Wai.Handler.Warp
@@ -37,21 +38,22 @@ import           Lib
 
 randomPick :: (MonadRandom m) => [a] -> m a
 randomPick arr = do
-    rand <- getRandomR (0, ((length arr) - 1))
+    rand <- getRandomR (0, length arr - 1)
     return $ arr !! rand
 
 
 coqHandler :: FilePath -> (Text, Html) -> Html
 coqHandler path (t, _) =
     let
-      cucked_path = "/static/coq/" <> path
-      style img = "background-image: url('" <> img <> "'); background-size: 100% 100%;"
+      cucked_path = "/static/coqs/" <> path
+      style img = trace img $ "background-image: url('" <> img <> "'); background-size: 100% 100%;"
     in
-      pre ! A.style (fromString $ style cucked_path) $ (fromString $ T.unpack t)
+      img ! A.src (fromString cucked_path) ! A.width "30%"
 
 htmlBlockHandlers :: FilePath -> Maybe Text -> (Text, Html) -> Html
-htmlBlockHandlers path (Just "Coq") = coqHandler path
-htmlBlockHandlers path lang = msBlockCodeRenderer defaultMarkdownSettings $ lang
+htmlBlockHandlers path mLang = case T.toLower <$> mLang of
+  Just "coq" -> coqHandler path
+  _          -> msBlockCodeRenderer defaultMarkdownSettings mLang
 
 handleGetThreads :: (Has (Lift IO) sig m, Has ThreadDB sig m, Has Frontend sig m) => m Text
 handleGetThreads = do
@@ -61,7 +63,7 @@ handleGetThreads = do
 handleGetComments :: (Has ThreadDB sig m, Has (Lift IO) sig m, Has Frontend sig m, MonadRandom m) => Text -> Text -> m Text
 handleGetComments static threadName = do
     comments <- getComments threadName
-    files <- sendIO $ getDirectoryContents $ T.unpack $ static <> "/coq"
+    files <- sendIO $ listDirectory $ T.unpack $ static <> "/coqs"
     file <- randomPick files
     let block = htmlBlockHandlers file
     let mdown = markdown def { msXssProtect = True, msBlockCodeRenderer = block }
@@ -92,7 +94,7 @@ server
   :: ( Has (Lift IO) sig m
      , Has ThreadDB sig m
      , Has Frontend sig m
-     , MonadRandom m)
+     , MonadRandom m )
   => Static
   -> ServerT BoardApi m
 server static

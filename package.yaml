@@ -68,6 +68,7 @@ library:
     - MultiParamTypeClasses
     - OverloadedStrings
     - ScopedTypeVariables
+    - StandaloneDeriving
     - TypeApplications
     - TypeOperators
     - UndecidableInstances
@@ -83,7 +84,10 @@ executables:
     dependencies:
       - lambda-board
     default-extensions:
+      - FlexibleInstances
+      - GeneralizedNewtypeDeriving
       - RankNTypes
+      - StandaloneDeriving
       - TypeApplications
 
 tests:

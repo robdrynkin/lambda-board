@@ -1,6 +1,7 @@
 module Control.Carrier.ThreadDB.Postgres where
 
 import           Control.Algebra
+import           Control.Monad.Random
 import           Control.Carrier.Lift
 import           Control.Carrier.Reader
 import           Data.Text                          (Text)
@@ -24,7 +25,7 @@ instance ToRow InsertComment where
     toRow (InsertComment threadName text date replyToId) = toRow (threadName, text, date, replyToId)
 
 newtype PgC m a = MkPgC { runPg :: m a }
-  deriving (Functor, Applicative, Monad)
+  deriving (Functor, Applicative, Monad, MonadRandom)
 
 instance ( Has (Lift IO) sig m, Has (Reader PgDb) sig m ) => Algebra (ThreadDB :+: sig) (PgC m) where
   alg hdl sig ctx = case sig of
