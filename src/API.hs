@@ -29,17 +29,26 @@ instance MimeRender HTML Text where
 
 type Redirect = (Headers '[Header "Location" Text] NoContent)
 
-newtype CreateThreadForm = CreateThreadForm { threadName :: Text }
-  deriving (Eq, Show, Generic)
+data CreateThreadForm = CreateThreadForm {
+  threadName :: Text,
+  token      :: Text
+} deriving (Eq, Show, Generic)
 
 data MessageForm = MessageForm {
   commentText :: !Text,
   threadName  :: !Text,
   replyToId   :: !Text
-  } deriving (Eq, Show, Generic)
+} deriving (Eq, Show, Generic)
+
+data DeleteCommentForm = DeleteCommentForm {
+  commentId  :: !Int,
+  threadName :: !Text,
+  token      :: !Text
+} deriving (Eq, Show, Generic)
 
 instance FromForm CreateThreadForm
 instance FromForm MessageForm
+instance FromForm DeleteCommentForm
 
 type RedirectResponse = Verb 'POST 301 '[HTML] Redirect
 
@@ -48,6 +57,7 @@ type BoardApi
   :<|> "thread" :> Capture "name" Text :> Get '[HTML] Text
   :<|> "create_thread" :> ReqBody '[FormUrlEncoded] CreateThreadForm :> RedirectResponse
   :<|> "message" :> ReqBody '[FormUrlEncoded] MessageForm :> RedirectResponse
+  :<|> "delete_comment" :> ReqBody '[FormUrlEncoded] DeleteCommentForm :> RedirectResponse
   :<|> "static" :> Raw
 
 boardApi :: Proxy BoardApi

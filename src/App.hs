@@ -77,10 +77,10 @@ threadBan :: String
 threadBan = "/\\#?"
 
 handleCreateThread :: (Has ThreadDB sig m, Has Frontend sig m) => CreateThreadForm -> m Redirect
-handleCreateThread (CreateThreadForm threadName) = do
+handleCreateThread (CreateThreadForm threadName token) = do
   let
     name = T.filter (`notElem` threadBan) $ T.strip $ sanitize threadName
-  addThread name
+  addThread (name, token)
   pure $ redirect ("thread/" <> name)
 
 handleMessage :: (Has (Lift IO) sig m, Has ThreadDB sig m, Has Frontend sig m) => MessageForm -> m Redirect
@@ -88,6 +88,11 @@ handleMessage (MessageForm commentText threadName replyToId) = do
     date <- sendIO getZonedTime
     let id_ = readMaybe $ T.unpack replyToId
     addComment $ InsertComment threadName commentText (T.pack $ show date) id_
+    pure $ redirect ("thread/" <> threadName)
+
+handleDeleteComment :: (Has (Lift IO) sig m, Has ThreadDB sig m, Has Frontend sig m) => DeleteCommentForm -> m Redirect
+handleDeleteComment (DeleteCommentForm commentId threadName token) = do
+    deleteComment (DeleteComment commentId threadName token)
     pure $ redirect ("thread/" <> threadName)
 
 server
@@ -102,4 +107,5 @@ server static
   :<|> handleGetComments (T.pack . T.unpack . unStatic $ static)
   :<|> handleCreateThread
   :<|> handleMessage
+  :<|> handleDeleteComment
   :<|> serveDirectoryWebApp (T.unpack . unStatic $ static)

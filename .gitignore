@@ -3,5 +3,5 @@
 /dist-newstyle
 /letsencrypt
 /pg
-/static/coqs/
+/static/coq/
 .env

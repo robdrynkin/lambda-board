@@ -8,5 +8,6 @@ CREATE TABLE comments (
 
 CREATE TABLE threads (
     name       STRING NOT NULL PRIMARY KEY,
-    ncomments  INTEGER
+    ncomments  INTEGER,
+    token      STRING NOT NULL
 );

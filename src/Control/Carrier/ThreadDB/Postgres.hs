@@ -24,6 +24,9 @@ instance FromRow (Comment Text) where
 instance ToRow InsertComment where
     toRow (InsertComment threadName text date replyToId) = toRow (threadName, text, date, replyToId)
 
+instance ToRow InsertThread where
+    toRow (InsertThread (Thread name ncomments) token) = toRow (name, ncomments, token)
+
 newtype PgC m a = MkPgC { runPg :: m a }
   deriving (Functor, Applicative, Monad, MonadRandom)
 
@@ -33,11 +36,11 @@ instance ( Has (Lift IO) sig m, Has (Reader PgDb) sig m ) => Algebra (ThreadDB :
 
     L GetThreads -> do
       MkPgDb conn <- ask
-      (<$ctx) <$> sendIO (query_ conn "select * from threads")
+      (<$ctx) <$> sendIO (query_ conn "select name, ncomments from threads")
 
     L (GetComments threadName) -> do
       MkPgDb conn <- ask
-      r <- sendIO $ query @(Only Text) @(Only Int) conn "select 1 from threads where name = (?)" (Only threadName)
+      r <- sendIO $ query @(Only Text) @(Only Int) conn "select ncomments from threads where name = (?)" (Only threadName)
       case r of
         [] -> pure $ [] <$ ctx -- FIXME throw 404
         _  -> sendIO $ (<$ ctx) <$> query conn "select * from comments where threadName = (?)" (Only threadName)
@@ -49,7 +52,15 @@ instance ( Has (Lift IO) sig m, Has (Reader PgDb) sig m ) => Algebra (ThreadDB :
         execute conn "UPDATE threads SET ncomments = ncomments + 1 WHERE name = (?)" (Only (ithreadName comment))
         return ()
 
-    L (AddThread threadName) -> (<$ctx) <$> do
+    L (AddThread (threadName, token)) -> (<$ctx) <$> do
       MkPgDb conn <- ask
-      sendIO $ execute conn "INSERT INTO threads (name, ncomments) VALUES (?,?)" (Thread threadName 0)
+      sendIO $ execute conn "INSERT INTO threads (name, ncomments, token) VALUES (?,?,?)" (InsertThread (Thread threadName 0) token)
       return ()
+
+    L (DoDeleteComment delComment) -> (<$ctx) <$> do
+      MkPgDb conn <- ask
+      r <- sendIO $ query @(Text, Text) @(Only Int) conn "SELECT COUNT(*) FROM threads WHERE name = (?) AND token = (?) LIMIT 1" (dthreadName delComment, dtoken delComment)
+      case r of
+        [] -> pure () -- FIXME throw 404
+        _  -> do sendIO $ execute conn "DELETE FROM comments WHERE id = (?) AND threadName = (?)" (dcommentId delComment, dthreadName delComment)
+                 return ()
