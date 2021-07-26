@@ -24,12 +24,17 @@ dependencies:
   - base >= 4.7 && < 5
   - blaze-html
   - bytestring
+  - containers
+  - directory
   - file-embed
   - fused-effects
+  - random
+  - MonadRandom
   - http-api-data
   - karver
   - markdown
   - optparse-applicative
+  - postgresql-simple
   - servant
   - servant-server
   - sqlite-simple
@@ -45,7 +50,6 @@ dependencies:
   - wai
   - warp
   - xss-sanitize
-  - postgresql-simple
 
 library:
   source-dirs: src
