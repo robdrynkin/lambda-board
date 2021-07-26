@@ -42,7 +42,8 @@ services:
       - "traefik.http.routers.board.tls.certresolver=myresolver"
 
   postgres:
-    image: postgres:13-alpine
+    image: postgres:13.3-buster
+    container_name: "board-db"
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_DB=database
