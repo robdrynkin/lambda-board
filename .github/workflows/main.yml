@@ -5,6 +5,7 @@ on:
 jobs:
   build_image:
     runs-on: ubuntu-20.04
+    if: false
     steps:
       - uses: actions/checkout@v2
       - name: Check Dockerhub credentials
@@ -49,7 +50,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   deploy:
-    needs: build_image
+    #needs: build_image
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
